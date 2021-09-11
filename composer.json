@@ -1,0 +1,18 @@
+{
+  "name": "steveaccount/steveengine",
+  "description": "My PHP engine",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Steve",
+      "email": "email@example.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "SteveAccount\\steveengine\\": "steveengine/"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
