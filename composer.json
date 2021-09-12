@@ -10,7 +10,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "SteveEngine\\": "/"
+      "SteveAccount\\SteveEngine\\": "/"
     }
   },
   "minimum-stability": "dev",
