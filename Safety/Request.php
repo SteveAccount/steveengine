@@ -6,16 +6,48 @@ use DateTime;
 use SteveEngine\Convert\Sha3;
 use SteveEngine\Singleton;
 
+/**
+ * Class Request
+ * @package SteveEngine\Safety
+ */
 class Request extends Singleton{
-    private $sessionId;
-    private $method;
-    private $path;
-    private $ip;
-    private $token;
+    /**
+     * @var string
+     */
+    private string $sessionId;
+    /**
+     * @var string
+     */
+    private string $method;
+    /**
+     * @var string
+     */
+    private string $path;
+    /**
+     * @var string
+     */
+    private string $ip;
+    /**
+     * @var string
+     */
+    private string $token;
+    /**
+     * @var
+     */
     private $data;
-    private $user;
-    private $session;
+    /**
+     * @var User
+     */
+    private User $user;
+    /**
+     * @var Session
+     */
+    private Session $session;
 
+    /**
+     * A Request osztály feltöltése.
+     * @return $this
+     */
     public function prepare() : Request{
         $this->method = strtolower( $_POST["_method"] ?? $_SERVER["REQUEST_METHOD"] );
         $index = strpos($_SERVER["REQUEST_URI"], "?");
@@ -32,6 +64,9 @@ class Request extends Singleton{
         return $this;
     }
 
+    /**
+     *
+     */
     public function check(){
         //Ha nincs sessionId, akkor login
         if ( $this->sessionId == "" ){
@@ -57,7 +92,11 @@ class Request extends Singleton{
         }
     }
 
-    public function method( string $method = ""){
+    /**
+     * @param string $method
+     * @return $this
+     */
+    public function method(string $method = ""){
         if( $method == ""){
             return $this->method;
         }
@@ -65,7 +104,11 @@ class Request extends Singleton{
         return $this;
     }
 
-    public function path( string $path = ""){
+    /**
+     * @param string $path
+     * @return string|Request
+     */
+    public function path(string $path = ""){
         if( $path == ""){
             return $this->path;
         }
@@ -73,7 +116,11 @@ class Request extends Singleton{
         return $this;
     }
 
-    public function ip( string $ip = ""){
+    /**
+     * @param string $ip
+     * @return $this
+     */
+    public function ip(string $ip = ""){
         if( $ip == ""){
             return $this->ip;
         }
@@ -81,7 +128,11 @@ class Request extends Singleton{
         return $this;
     }
 
-    public function session( Session $session = null){
+    /**
+     * @param Session|null $session
+     * @return $this
+     */
+    public function session(Session $session = null){
         if( !$session ){
             return $this->session;
         }
@@ -89,7 +140,11 @@ class Request extends Singleton{
         return $this;
     }
 
-    public function sessionId( string $sessionId = ""){
+    /**
+     * @param string $sessionId
+     * @return $this
+     */
+    public function sessionId(string $sessionId = ""){
         if( $sessionId == "" ){
             return $this->sessionId;
         }
@@ -97,11 +152,18 @@ class Request extends Singleton{
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function token(){
         return $this->token;
     }
 
-    public function more( $findKey ){
+    /**
+     * @param $findKey
+     * @return array
+     */
+    public function more($findKey ){
         $keys = is_array( $findKey ) ? $findKey : [$findKey];
         $result = [];
         foreach( $keys as $key){
@@ -112,14 +174,24 @@ class Request extends Singleton{
         return $result;
     }
 
-    public function only( $findKey ){
+    /**
+     * @param $findKey
+     * @return mixed|null
+     */
+    public function only($findKey ){
         return $this->data[$findKey] ?? null;
     }
 
+    /**
+     * @return mixed
+     */
     public function all(){
         return $this->data;
     }
 
+    /**
+     * @return mixed
+     */
     private function loadSession(){
         // A session betöltése
         $session = Session::selectByWhere( "sessionId", $this->sessionId());
@@ -139,6 +211,9 @@ class Request extends Singleton{
         return $session[0];
     }
 
+    /**
+     *
+     */
     private function newSession(){
         $this->session( Session::new() );
         $this->session->insert();
@@ -146,6 +221,9 @@ class Request extends Singleton{
         $_SESSION["sessionId"] = $this->sessionId();
     }
 
+    /**
+     * @return string
+     */
     private function getIp() : string{
         if(!empty($_SERVER['HTTP_CLIENT_IP'])) {  
             $ip = $_SERVER['HTTP_CLIENT_IP'];  
