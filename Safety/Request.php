@@ -1,6 +1,6 @@
 <?php
 
-namespace SteveAccount\SteveEngine\Safety;
+namespace SteveEngine\Safety;
 
 use DateTime;
 use SteveEngine\Convert\Sha3;
@@ -46,7 +46,7 @@ class Request extends Singleton{
 
     /**
      * A Request osztály feltöltése.
-     * @return $this
+     * @return Request
      */
     public function prepare() : Request{
         $this->method = strtolower( $_POST["_method"] ?? $_SERVER["REQUEST_METHOD"] );
