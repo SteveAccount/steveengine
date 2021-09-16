@@ -49,6 +49,8 @@ class Request extends Singleton{
      * @return Request
      */
     public function prepare() : Request{
+        session_start();
+
         $this->method = strtolower( $_POST["_method"] ?? $_SERVER["REQUEST_METHOD"] );
         $index = strpos($_SERVER["REQUEST_URI"], "?");
         if ($index){
