@@ -1,13 +1,23 @@
 <?php
 
+use SteveEngine\Config;
 use SteveEngine\Data\Database;
 use SteveEngine\IComparable;
 use SteveEngine\Router\Router;
 use SteveEngine\Safety\Request;
 use SteveEngine\Validate\Validate;
 
+
 /**
- * Return a singleton Route class what contents routes.
+ * Returns a singleton Config class.
+ * @return Config
+ */
+function config() : Config{
+    return Config::new();
+}
+
+/**
+ * Returns a singleton Route class what contents routes.
  * @param string $routeName
  * @return string
  */
@@ -16,7 +26,7 @@ function route(string $routeName ) : string{
 }
 
 /**
- * Return a singleton Database class.
+ * Returns a singleton Database class.
  * @return Database
  */
 function db() : Database{
@@ -24,7 +34,7 @@ function db() : Database{
 }
 
 /**
- * Return a singleton Request class.
+ * Returns a singleton Request class.
  * @return Request
  */
 function request() : Request{
@@ -32,7 +42,7 @@ function request() : Request{
 }
 
 /**
- * Return a singleton Validate class.
+ * Returns a singleton Validate class.
  * @return Validate
  */
 function validate() : Validate{

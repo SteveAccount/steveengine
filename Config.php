@@ -16,7 +16,7 @@ class Config extends Singleton{
      * @return Config
      */
     public function prepare(){
-        $this->settings = include ("/config.php");
+        $this->settings = include ("./config.php");
         return $this;
     }
 
