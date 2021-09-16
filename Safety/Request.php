@@ -96,7 +96,7 @@ class Request extends Singleton{
 
     /**
      * @param string $method
-     * @return $this
+     * @return string|Request
      */
     public function method(string $method = ""){
         if( $method == ""){
@@ -120,7 +120,7 @@ class Request extends Singleton{
 
     /**
      * @param string $ip
-     * @return $this
+     * @return string|Request
      */
     public function ip(string $ip = ""){
         if( $ip == ""){
@@ -132,7 +132,7 @@ class Request extends Singleton{
 
     /**
      * @param Session|null $session
-     * @return $this
+     * @return Session|Request
      */
     public function session(Session $session = null){
         if( !$session ){
@@ -144,7 +144,7 @@ class Request extends Singleton{
 
     /**
      * @param string $sessionId
-     * @return $this
+     * @return string|Request
      */
     public function sessionId(string $sessionId = ""){
         if( $sessionId == "" ){
@@ -204,7 +204,7 @@ class Request extends Singleton{
             redirect( "loginPage" );
         }
         if( count( $session ) > 1){
-            db()->query( "delete from session where sessionId=:sessionId")
+            db()->query(/** @lang text */ "delete from session where sessionId=:sessionId")
                 ->params( ["sessionId" => $this->sessionId()])
                 ->run();
             session_destroy();
