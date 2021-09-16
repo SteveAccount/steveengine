@@ -1,6 +1,6 @@
 <?php
 
-namespace SteveEngine\Safety;
+namespace SteveAccount\SteveEngine\Safety;
 
 use DateTime;
 use SteveEngine\Convert\Sha3;
