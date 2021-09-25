@@ -59,7 +59,7 @@ class Request extends Singleton{
             $this->path($_SERVER["REQUEST_URI"]);
         }
         $this->ip( filter_var( $this->getIp() ));
-        $this->sessionId( $_SESSION["sessionId"] ?? "" );
+        $this->sessionId = $_SESSION["sessionId"] ?? "";
         $this->token = $_POST["token"] ?? "";
         $this->passport = $_POST["passport"] ?? "";
         $this->data = $_POST + $_GET;
