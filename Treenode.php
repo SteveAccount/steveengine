@@ -15,7 +15,7 @@ class TreeNode{
     public function fillTree( array $data, string $idField, string $parentField ) : TreeNode{
         foreach( $data as $row ){
             $subNode = new TreeNode( $row->$idField, $row );
-            if ( $row->$parentField === "0" ){
+            if ( $row->$parentField == "0" ){
                 $this->nodes[] = $subNode;            
             }else{
                 $node = $this->findNodeById( $row->$parentField );

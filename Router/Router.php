@@ -17,19 +17,14 @@ class Router extends Singleton{
     }
 
     public function routeMe(){
-        $current = request()->path();
-        $method = request()->method();
-        $routes = isset($this->map->routes[$method]) ? $this->map->routes[$method] : [];
+        $current    = request()->path();
+        $method     = request()->method();
+        $routes     = isset($this->map->routes[$method]) ? $this->map->routes[$method] : [];
 
         foreach ($routes as $route) {
-            if ($route->path === $current || ("/" . $route->path) === $current){
+            if ($route->path === $current || ($route->path . "/") === $current){
                 $class = "";
-//                if ($index = strpos($route->class, "Controller")){
-//                    $namespace = substr($route->class, 0, $index);
-//                    $class = "$namespace\\$route->class";
-//                } else{
-//                    $class = $route->class;
-//                }
+                
                 $class = $route->class;
 //                echo "class: ". $class;
                 if (class_exists($class)){
