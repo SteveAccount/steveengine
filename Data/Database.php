@@ -7,15 +7,16 @@ use SteveEngine\Singleton;
 
 class Database extends Singleton{
     private $connectionInfo;
-    private $pdo;
+    private \PDO $pdo;
     private $query;
     private $answer = "array";
     private $params;
     private $data;
     private $tableName;
+    private $error;
 
     public function prepare( array $connectionInfo, bool $hasDatabase = true ){
-        $this->connectionInfo = $connectionInfo["connection"];
+        $this->connectionInfo = $connectionInfo;
         $this->pdo = $this->getConnection( $hasDatabase );
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
@@ -66,15 +67,30 @@ class Database extends Singleton{
         return $this;
     }
 
+    public function switchDb(string $databaseName){
+        try{
+           $this->pdo->exec("use " . $databaseName);
+           return true;
+        }catch (\PDOException $e){
+            $this->error = [$stmt->errorInfo()[1] => $stmt->errorInfo()[2]];
+            return false;
+        }
+    }
+    
     /**
      * Futtat egy lekérdezést. 
      */
-    public function run() : \PDOStatement{
+    public function run() : ?\PDOStatement{
         $stmt = $this->pdo->prepare( $this->query );
-        if ( isset( $this->params )){
-            $stmt->execute( $this->params );
-        }else{
-            $stmt->execute();
+        try{
+            if ( isset( $this->params )){
+                $stmt->execute( $this->params );
+            }else{
+                $stmt->execute();
+            }
+        }catch(\PDOException $e){
+            $this->error = [$stmt->errorInfo()[1] => $stmt->errorInfo()[2]];
+            return null;
         }
         return $stmt;
     }
@@ -169,6 +185,10 @@ class Database extends Singleton{
 
     public function endTransaction( bool $isCommit ){
         $isCommit ? $this->pdo->commit() : $this->pdo->rollBack();
+    }
+
+    public function getErrors() : array{
+        return $this->error;
     }
 
     private function clear(){

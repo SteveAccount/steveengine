@@ -10,6 +10,7 @@ class TreeNode{
     public function __construct( $id = 0, $content = null ){
         $this->id = $id;
         $this->content = $content;
+        return $this;
     }
 
     public function fillTree( array $data, string $idField, string $parentField ) : TreeNode{
