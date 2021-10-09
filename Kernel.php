@@ -21,8 +21,8 @@ function config() : Config{
  * @param string $routeName
  * @return string
  */
-function route(string $routeName ) : string{
-    return Router::new()->getPathByRouteName( $routeName );
+function route(string $routeName) : ?string{
+    return Router::new()->getPathByRouteName($routeName);
 }
 
 /**
@@ -52,9 +52,21 @@ function validate() : Validate{
 /**
  * @param string $routeName
  */
-function redirect(string $routeName ){
-    $newRoute = route( $routeName );
-    header( "Location: " . $newRoute );
+function redirect(string $routeName){
+    if ($route = route($routeName)){
+        toLog($route);
+        header( "Location: " . $route );
+        exit;
+    }
+    toLog("Nincs $routeName nevű útvonal.");
+    http_response_code(404);
+    die;
+}
+
+function response($message, int $code = 200, bool $isJson = true){
+    http_response_code($code);
+    $message = $isJson ? json_encode($message) : $message;
+    return $message;
 }
 
 /**
@@ -129,10 +141,8 @@ function compareObject(IComparable $object1, IComparable $object2 ) : bool{
  * @param bool $isAppend
  */
 function toLog($some, $isAppend = true){
-    $fileContent = $isAppend ? file_get_contents("log.php") : "";
-    $var_str = var_export($some, true);
-    $var = "<?php\n\n\$some = $var_str;\n\n?>";
-    $fileContent .= (new DateTime())->format("Y-m-d H:i:s");
-    $fileContent .= $var;
+    $fileContent     = $isAppend ? file_get_contents("log.php") : "";
+    $fileContent    .= "\n\n" . (new DateTime())->format("Y-m-d H:i:s") . "\n";
+    $fileContent    .= var_export($some, true);
     file_put_contents('log.php', $fileContent);
 }

@@ -30,15 +30,15 @@ class Request extends Singleton{
     /**
      * @var string
      */
-    private string $token;
+    private string $csrf;
     /**
-     * @var
+     * @var array
      */
-    private $data;
+    private array $data;
     /**
-     * @var User
+     * @var User|null
      */
-    private User $user;
+    private ?User $user;
     /**
      * @var Session
      */
@@ -51,45 +51,46 @@ class Request extends Singleton{
     public function prepare() : Request{
         session_start();
 
-        $this->method = strtolower( $_POST["_method"] ?? $_SERVER["REQUEST_METHOD"] );
-        $index = strpos($_SERVER["REQUEST_URI"], "?");
+        $this->method   = strtolower( $_POST["_method"] ?? $_SERVER["REQUEST_METHOD"] );
+        $index          = strpos($_SERVER["REQUEST_URI"], "?");
         if ($index){
             $this->path(substr($_SERVER["REQUEST_URI"], 0, $index));
         } else{
             $this->path($_SERVER["REQUEST_URI"]);
         }
         $this->ip( filter_var( $this->getIp() ));
-        $this->sessionId = $_SESSION["sessionId"] ?? "";
-        $this->token = $_POST["token"] ?? "";
-        $this->passport = $_POST["passport"] ?? "";
-        $this->data = $_POST + $_GET;
+        $this->sessionId    = $_SESSION["sessionId"] ?? "";
+        $this->csrf         = $_POST["csrf"] ?? "";
+        $this->data         = $_POST + $_GET;
         return $this;
     }
 
+
     /**
-     *
+     * @throws \Exception
      */
     public function check(){
-        //Ha nincs sessionId, akkor login
-        if ( $this->sessionId == "" ){
-            redirect( "loginPage" );
-        }
+        //Ha nincs sessionId, akkor csinájunk, egyébként a session és a user betöltése.
+        $this->session  = Session::getBySessionId($this->sessionId) ?? $this->session(Session::new());
+        $this->user = User::selectById($this->session->userId);
 
-        //Ha a kérés login, akkor get estén új session, majd mehet tovább.
-        if( request()->path() == route( "loginPage" )){
-            if( request()->method() == "get" ){
-                $this->newSession();
-            }else{
-                $this->session = $this->loadSession();        
-            }
+        //Ha nem kell a programhoz User, akkor mehet tovább.
+        if (!config()->get("hasUser")){
+            return;
+        }
+        
+        //Ha a method GET, az útvonal loginPage vagy regPage, akkor mehet tovább.
+        if ($this->method === "get" && ($this->path === route(config()->get("loginPage")) || $this->path === route("regPage"))){
+            return;
+        }
+        
+        //Ha a method POST, az útvonal login vagy reg, akkor mehet tovább.
+        if ($this->method === "post" && ($this->path === route(config()->get("loginPage")) || $this->path === route("reg"))){
             return;
         }
 
-        //Ha a kérés nem login, akkor töltsük be a session-t.
-        $this->session = $this->loadSession();
-
-        //Ha nincs user, vagy a session érvényessége lejárt, akkor login.
-        if( $this->session->userId == 0 || $this->session->expirationDate < (new \DateTime())->format("Y-m-d H:i:s") ){
+        //Minden egyéb esetben érvényes Session és adatbázisban szereplő User kell.
+        if  (!(isset($this->user) && $this->session->expirationDate > (new \DateTime())->format("Y-m-d H:i:s"))){
             redirect( "loginPage");
         }
     }
@@ -138,7 +139,9 @@ class Request extends Singleton{
         if( !$session ){
             return $this->session;
         }
-        $this->session = $session;
+        $this->session          = $session;
+        $this->sessionId        = $session->sessionId;
+        $_SESSION["sessionId"]  = $session->sessionId;
         return $this;
     }
 
@@ -147,7 +150,7 @@ class Request extends Singleton{
      * @return string|Request
      */
     public function sessionId(string $sessionId = ""){
-        if( $sessionId == "" ){
+        if( $sessionId === "" ){
             return $this->sessionId;
         }
         $this->sessionId = $sessionId;
@@ -165,7 +168,8 @@ class Request extends Singleton{
      * @param $findKey
      * @return array
      */
-    public function more($findKey ){
+    public function more($findKey ) : array
+    {
         $keys = is_array( $findKey ) ? $findKey : [$findKey];
         $result = [];
         foreach( $keys as $key){
@@ -189,38 +193,6 @@ class Request extends Singleton{
      */
     public function all(){
         return $this->data;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function loadSession(){
-        // A session betöltése
-        $session = Session::selectByWhere( "sessionId", $this->sessionId());
-
-        //Ellenőrizni a session-t. Ha van sessionId, akkor csak 1 db session lehet. Minden egyéb megoldás hibás.
-        if( count( $session) == 0 ){
-            session_destroy();
-            redirect( "loginPage" );
-        }
-        if( count( $session ) > 1){
-            db()->query(/** @lang text */ "delete from session where sessionId=:sessionId")
-                ->params( ["sessionId" => $this->sessionId()])
-                ->run();
-            session_destroy();
-            redirect( "loginPage" );
-        }
-        return $session[0];
-    }
-
-    /**
-     *
-     */
-    private function newSession(){
-        $this->session( Session::new() );
-        $this->session->insert();
-        $this->sessionId( $this->session->sessionId );
-        $_SESSION["sessionId"] = $this->sessionId();
     }
 
     /**

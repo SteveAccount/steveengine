@@ -17,16 +17,20 @@ abstract class Model{
         return $result ? $result[0] : null;
     }
 
-    public static function selectByWhere( string $fieldName, $value ) : array{
+    public static function selectByWhere(array $conditions, bool $isOnlyOne = false){
         $table = self::getTablename();
-        $query = "select * from $table where $fieldName=:$fieldName";    
-        $result = db()->query( $query )->answer( static::class )->params( [$fieldName => $value] )->select();
-        return $result ?? [];
+        $where = "";
+        foreach ($conditions as $field => $value){
+            $where .= $where === "" ? "$field=:$field" : " and $field=:$field";
+        }
+        $query  = "select * from $table where $where";
+        $result = db()->query($query)->answer(static::class)->params($conditions)->select();
+        return count($result) > 0 ? ($isOnlyOne ? $result[0] : $result) : null;
     }
 
-    public static function selectByQuery( string $query ){
-        $table = self::getTablename();
-        $result = db()->query( $query )->answer( static::class )->select();
+    public static function selectByQuery(string $query){
+        $table  = self::getTablename();
+        $result = db()->query($query)->answer(static::class)->select();
         return $result ?? [];
     }
 
@@ -37,6 +41,7 @@ abstract class Model{
     public function update(){
         db()->data( $this )->update();
     }
+    
     private static function getTablename() : string{
         $parts = explode( "\\", static::class );
         return strtolower( $parts[count( $parts ) -1] );

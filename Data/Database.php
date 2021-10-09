@@ -90,6 +90,7 @@ class Database extends Singleton{
             }
         }catch(\PDOException $e){
             $this->error = [$stmt->errorInfo()[1] => $stmt->errorInfo()[2]];
+            toLog($this->error);
             return null;
         }
         return $stmt;
@@ -99,13 +100,14 @@ class Database extends Singleton{
      * Select lekérdezés futtatása.
      */
     public function select() : array{
-        $stmt = $this->run();
         $result = [];
-        if ( $this->answer == "array" ){
-            $result = $stmt->fetchAll();
-        }else{
-            while ( $row = $stmt->fetchObject( $this->answer )){
-                $result[] = $row;
+        if ($stmt = $this->run()){
+            if ($this->answer === "array"){
+                $result = $stmt->fetchAll();
+            }else{
+                while ($row = $stmt->fetchObject($this->answer)){
+                    $result[] = $row;
+                }
             }
         }
         $this->clear();

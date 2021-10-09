@@ -1,5 +1,17 @@
 <?php
 
+/*
+Fontos!!!
+A vendor/steveaccount/steveengine/_copyToRoot mappa tartalmát be kell másolni a gyökérkönyvtárba.
+A composer.json fájlba be kell illeszteni a következőt:
+"autoload": {
+    "psr-4": {
+      "System\\": "Moduls/System"
+    }
+  }
+Majd frissítsd az autoloadert!
+*/
+
 use SteveEngine\Config;
 use SteveEngine\Data\Database;
 use SteveEngine\Data\Setup;
@@ -20,21 +32,27 @@ include "vendor/steveaccount/steveengine/Kernel.php";
 
 //Az engine működéséhez szükséges adatbázis létrehozása
 //Az első alkalommal kell lefutnia.
-$setup = new Setup();
-if (!$setup->createDatabase("webcompany")){
-    die ("Hiba történt az adatbázis létrehozása során.");
-} else{
-    die("Az adatbázis létrehozása megtörtént.");
-}
+//$setup = new Setup();
+//if (!$setup->createDatabase("webcompany")){
+//    die ("Hiba történt az adatbázis létrehozása során.");
+//} else{
+//    die("Az adatbázis létrehozása megtörtént.");
+//}
 
-
-//A Request osztály létrehozása
-$request = Request::new()->prepare();
+//A Database osztály inicializálása
+Database::new()->prepare(config()->get("databaseInfo")["main"]);
 
 //A Router osztály inicializálása, az útvonalak regisztrálása
 $router = Router::new();
 $router->map()
     ->group     ("/wc", (new Map)
-        ->get   ("", "Main\MainController", "pageMain"));
+        ->get   ("/login", "System\SystemController", "loginPage", "loginPage")
+        ->post  ("/login", "System\SystemController", "login", "login")
+        ->get   ("/registration", "System\SystemController", "regPage", "regPage")
+        ->post  ("/registration", "System\SystemController", "reg", "reg")
+        ->get   ("/", "Main\MainController", "pageMain", "mainPage"));
+
+//A Request osztály létrehozása, a session és a user ellenőrzése
+$request = Request::new()->prepare()->check();
 
 $router->routeMe();

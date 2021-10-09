@@ -53,16 +53,15 @@ class Router extends Singleton{
 //        include \Config()->appPath . "/html/0404.html";
     }
 
-    public function getPathByRouteName( string $name ) : string{
-        return $this->map[$name]->path;
-    }
-
-    public function loadRoutes() : Router{
-        $routes = json_decode( file_get_contents( Config::get("appPath") . "/Config/routes.json"), true );
-        foreach( $routes as $routeName => $routeInfo ){
-            $this->map += [$routeName => new Route( $routeInfo["method"], $routeInfo["path"], $routeInfo["class"], $routeInfo["function"])];
+    public function getPathByRouteName( string $name ) : ?string{
+        foreach ($this->map->routes as $method => $routes){
+            foreach ($routes as $route){
+                if ($route->name === $name){
+                    return $route->path;
+                }
+            }
         }
-        return $this;
+        return null;
     }
 
     private function getRouteByRequest(){
