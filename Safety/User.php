@@ -26,6 +26,10 @@ class User extends Model{
      * @var string
      */
     public string $passwordHash;
+    /**
+     * @var string
+     */
+    public string $permissions;
 
     /**
      * @return User
@@ -42,5 +46,9 @@ class User extends Model{
             "email"     => Field::emailAddress()->message("Nem megfelelő emailcím."),
             "password"  => Field::password()->message("A jelszó 5-20 karekter lehet és betűket, számokat tartalmazhat.")
         ];
+    }
+
+    public function getPermissions() : array{
+        return json_decode($this->permissions, 1);
     }
 }

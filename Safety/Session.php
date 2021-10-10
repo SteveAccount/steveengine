@@ -32,9 +32,9 @@ class Session extends Model{
      */
     public string $expirationDate;
     /**
-     * @var string
+     * @var string|null
      */
-    public string $token;
+    public ?string $token;
 
     /**
      * @param int $userId

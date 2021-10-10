@@ -38,7 +38,7 @@ class Request extends Singleton{
     /**
      * @var User|null
      */
-    private ?User $user;
+    public ?User $user;
     /**
      * @var Session
      */

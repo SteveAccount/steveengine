@@ -2,16 +2,45 @@
 
 namespace SteveEngine\Router;
 
+/**
+ * Class Route
+ * @package SteveEngine\Router
+ */
 class Route{
-    public $path;
-    public $class;
-    public $method;
-    public $name;
+    /**
+     * @var string
+     */
+    public string $path;
+    /**
+     * @var string
+     */
+    public string $class;
+    /**
+     * @var string
+     */
+    public string $method;
+    /**
+     * @var string
+     */
+    public string $name;
+    /**
+     * @var string
+     */
+    public string $permission;
 
-    public function __construct( string $path, string $class, string $method, string $name ){
-        $this->path     = strtolower( $path );
-        $this->class    = $class;
-        $this->method   = $method;
-        $this->name     = $name;
+    /**
+     * Route constructor.
+     * @param string $path
+     * @param string $class
+     * @param string $method
+     * @param string $name
+     * @param string $permission
+     */
+    public function __construct(string $path, string $class, string $method, string $name, string $permission){
+        $this->path         = strtolower($path);
+        $this->class        = $class;
+        $this->method       = $method;
+        $this->name         = $name;
+        $this->permission   = $permission;
     }
 }

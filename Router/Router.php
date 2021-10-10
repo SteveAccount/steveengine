@@ -9,7 +9,7 @@ class Router extends Singleton{
     /**
      * @var Map
      */
-    public $map;
+    public Map $map;
 
     public function map() : Map{
         $this->map = new Map();
@@ -19,26 +19,23 @@ class Router extends Singleton{
     public function routeMe(){
         $current    = request()->path();
         $method     = request()->method();
-        $routes     = isset($this->map->routes[$method]) ? $this->map->routes[$method] : [];
+        $routes     = $this->map->routes[$method] ?? [];
 
         foreach ($routes as $route) {
             if ($route->path === $current || ($route->path . "/") === $current){
                 $class = "";
                 
                 $class = $route->class;
-//                echo "class: ". $class;
                 if (class_exists($class)){
                     if (method_exists($class, $route->method)){
                         $method = $route->method;
                         if ($myClass = new $class){
-                            if (isset($myClass->isAdmin)){
-                                if (!request()->user() || request()->user()->isAdmin != 1){
-                                    header("Location: /login");
-                                    return;
-                                }
+                            if ($route->permission && request()->user && in_array($route->permission,  request()->user->getPermissions())){
+                                echo $myClass->$method();
+                                return;
+                            }else{
+                                response("Nincs jogosultságod a funkcióhoz.", 403);
                             }
-                            echo $myClass->$method();
-                            return;
                         }
                     } else{
                         echo "Nincs ilyen funkció";
