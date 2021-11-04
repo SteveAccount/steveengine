@@ -3,6 +3,7 @@
 namespace SteveEngine\Router;
 
 use SteveEngine\Config;
+use SteveEngine\Safety\User;
 use SteveEngine\Singleton;
 
 class Router extends Singleton{
@@ -30,7 +31,7 @@ class Router extends Singleton{
                     if (method_exists($class, $route->method)){
                         $method = $route->method;
                         if ($myClass = new $class){
-                            if ($route->permission && request()->user && in_array($route->permission,  request()->user->getPermissions())){
+                            if ($this->isPermissionOK($route, request()->user)){
                                 echo $myClass->$method();
                                 return;
                             }else{
@@ -59,6 +60,21 @@ class Router extends Singleton{
             }
         }
         return null;
+    }
+
+    private function isPermissionOK(Route $route, ?User $user) : bool{
+        if ($route->permission === []){
+            return true;
+        }
+        if (!$user){
+            return false;
+        }
+        foreach ($route->permission as $permission){
+            if (in_array($permission, $user->getPermissions())){
+                return true;
+            }
+        }
+        return false;
     }
 
     private function getRouteByRequest(){

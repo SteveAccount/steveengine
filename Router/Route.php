@@ -24,9 +24,9 @@ class Route{
      */
     public string $name;
     /**
-     * @var string
+     * @var array
      */
-    public string $permission;
+    public array $permission;
 
     /**
      * Route constructor.
@@ -36,8 +36,8 @@ class Route{
      * @param string $name
      * @param string $permission
      */
-    public function __construct(string $path, string $class, string $method, string $name, string $permission){
-        $this->path         = strtolower($path);
+    public function __construct(string $path, string $class, string $method, string $name, array $permission){
+        $this->path         = $path;
         $this->class        = $class;
         $this->method       = $method;
         $this->name         = $name;

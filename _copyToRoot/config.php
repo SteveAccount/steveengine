@@ -10,6 +10,13 @@ return [
             "password"          => "",
             "database"          => "webcompany"
         ],
+        "pp"                  => [
+            "server"            => "109.74.52.62",
+            "port"              => 43967,
+            "username"          => "DB_Admin",
+            "password"          => "DB_Admin456",
+            "database"          => "companydata"
+        ],
     ],
 
     //Rögzített útvonalnevek

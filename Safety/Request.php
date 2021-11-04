@@ -69,30 +69,35 @@ class Request extends Singleton{
     /**
      * @throws \Exception
      */
-    public function check(){
+    public function check() : bool{
         //Ha nincs sessionId, akkor csinájunk, egyébként a session és a user betöltése.
-        $this->session  = Session::getBySessionId($this->sessionId) ?? $this->session(Session::new());
+        $this->session  = Session::getBySessionId($this->sessionId) ?? Session::new();
         $this->user = User::selectById($this->session->userId);
 
         //Ha nem kell a programhoz User, akkor mehet tovább.
         if (!config()->get("hasUser")){
-            return;
+            return true;
         }
         
         //Ha a method GET, az útvonal loginPage vagy regPage, akkor mehet tovább.
         if ($this->method === "get" && ($this->path === route(config()->get("loginPage")) || $this->path === route("regPage"))){
-            return;
+            return true;
         }
         
         //Ha a method POST, az útvonal login vagy reg, akkor mehet tovább.
         if ($this->method === "post" && ($this->path === route(config()->get("loginPage")) || $this->path === route("reg"))){
-            return;
+            return true;
         }
 
         //Minden egyéb esetben érvényes Session és adatbázisban szereplő User kell.
         if  (!(isset($this->user) && $this->session->expirationDate > (new \DateTime())->format("Y-m-d H:i:s"))){
+            if ($this->method === "post"){
+                http_response_code(401);
+                return false;
+            }
             redirect( "loginPage");
         }
+        return true;
     }
 
     /**

@@ -25,6 +25,14 @@ class User extends Model{
     /**
      * @var string
      */
+    public string $monogram;
+    /**
+     * @var string
+     */
+    public ?string $image;
+    /**
+     * @var string
+     */
     public string $passwordHash;
     /**
      * @var string
