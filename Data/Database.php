@@ -9,7 +9,7 @@ class Database extends Singleton{
     private $connectionInfo;
     private \PDO $pdo;
     private $query;
-    private $answer = "array";
+    private $answer = "StdClass";
     private $params;
     private $data;
     private $tableName;
@@ -19,6 +19,7 @@ class Database extends Singleton{
         $this->connectionInfo = $connectionInfo;
         $this->pdo = $this->getConnection( $hasDatabase );
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
     }
 
     /**
@@ -90,6 +91,7 @@ class Database extends Singleton{
             }
         }catch(\PDOException $e){
             $this->error = [$stmt->errorInfo()[1] => $stmt->errorInfo()[2]];
+            toLog($this->query);
             toLog($this->error);
             return null;
         }
@@ -117,14 +119,21 @@ class Database extends Singleton{
     /**
      * Select lekérdezés futtatása. Egyetlen értékkel tér vissza.
      */
-    public function scalar(){
+    public function scalar(string $field = null){
         $stmt = $this->run();
-        $result = $stmt->fetchAll();
+        if ($stmt) {
+            $result = $stmt->fetchAll();
+        }
         $this->clear();
-        return isset( $result[0][0] ) ? $result[0][0] : null;
+
+        if ($field){
+            return isset( $result[0]->$field ) ? $result[0]->$field : null;
+        } else{
+            return isset( $result[0][0] ) ? $result[0][0] : null;
+        }
     }
 
-    public function insert() : int{
+    public function insert() : ?int{
         $parts = explode( "\\", get_class( $this->data[0] ));
         $className =  $parts[ count( $parts ) - 1 ];
         $tableName = strtolower( isset( $this->tableName ) ? $this->tableName : $className );
@@ -138,15 +147,41 @@ class Database extends Singleton{
             }
         }
         $query = "insert ignore into $tableName ($fields) values ($valueFields)";
-        
+toLog($query);
+        try{
+            $stmt = $this->pdo->prepare( $query );
+            foreach ( $this->data as $row ){
+                $values = (array)$row;
+                unset( $values["id"] );
+                $stmt->execute( $values );
+            }
+            return (int)$this->pdo->lastInsertId();
+        } catch (\PDOException $e){
+            toLog($e->getMessage());
+            return null;
+        }
+    }
+
+    public function insertWithId() : ?int{
+        $parts = explode( "\\", get_class( $this->data[0] ));
+        $className =  $parts[ count( $parts ) - 1 ];
+        $tableName = strtolower( isset( $this->tableName ) ? $this->tableName : $className );
+
+        //Keys
+        $fields = $valueFields = "";
+        foreach ( $this->data[0] as $key => $value){
+            $fields .= $fields == "" ? $key : ", $key";
+            $valueFields .= $valueFields == "" ? ":$key" : ", :$key";
+        }
+        $query = "insert ignore into $tableName ($fields) values ($valueFields)";
+
         $stmt = $this->pdo->prepare( $query );
         foreach ( $this->data as $row ){
             $values = (array)$row;
-            unset( $values["id"] );
             $stmt->execute( $values );
         }
-        
-        $lastId = $this->pdo->lastInsertId();
+
+        $lastId = $this->pdo->lastInsertId() ?? null;
         return $lastId;
     }
 
@@ -176,6 +211,7 @@ class Database extends Singleton{
             }
         }
         $query = "update $tableName set $fields where id=$id";
+        toLog($query);
         $stmt = $this->pdo->prepare( $query );
         $stmt->execute();
         return;
@@ -185,12 +221,27 @@ class Database extends Singleton{
         $this->pdo->beginTransaction();
     }
 
-    public function endTransaction( bool $isCommit ){
-        $isCommit ? $this->pdo->commit() : $this->pdo->rollBack();
+    public function endTransaction( bool $isCommit = true ){
+        try{
+            $isCommit ? $this->pdo->commit() : $this->pdo->rollBack();
+        } catch (\PDOException $e){}
     }
 
     public function getErrors() : array{
         return $this->error;
+    }
+
+    public function getIn(array $list) : string{
+        $result = "";
+        foreach ($list as $item){
+            if (is_numeric($item)) {
+                $result .= $result === "" ? $item : ", $item";
+            } else {
+                $result .= $result === "" ? "'$item'" : ", '$item'";
+            }
+
+        }
+        return $result;
     }
 
     private function clear(){
@@ -202,6 +253,9 @@ class Database extends Singleton{
     protected function getConnection( bool $hasDatabase = true ) : \PDO{
         try{
             $dsn = "mysql:host=".$this->connectionInfo["server"].";";
+            if ($this->connectionInfo["port"] != ""){
+                $dsn .= " port=".$this->connectionInfo["port"].";";
+            }
             if ( $this->connectionInfo["database"] != "" && $hasDatabase ){
                 $dsn .= " dbname=".$this->connectionInfo["database"].";";
             }

@@ -21,7 +21,6 @@ class Router extends Singleton{
         $current    = request()->path();
         $method     = request()->method();
         $routes     = $this->map->routes[$method] ?? [];
-
         foreach ($routes as $route) {
             if ($route->path === $current || ($route->path . "/") === $current){
                 $class = "";
@@ -32,7 +31,13 @@ class Router extends Singleton{
                         $method = $route->method;
                         if ($myClass = new $class){
                             if ($this->isPermissionOK($route, request()->user)){
-                                echo $myClass->$method();
+                                try{
+                                    echo $myClass->$method();
+                                } catch(\Exception $e){
+                                    db()->endTransaction(false);
+                                    http_response_code($e->getCode());
+                                    echo $e->getMessage();
+                                }
                                 return;
                             }else{
                                 response("Nincs jogosultságod a funkcióhoz.", 403);

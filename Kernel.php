@@ -41,6 +41,10 @@ function request() : Request{
     return Request::new();
 }
 
+function isPermission(string $permission) : bool {
+    return in_array($permission, \request()->user->permissions);
+}
+
 /**
  * Returns a singleton Validate class.
  * @return Validate

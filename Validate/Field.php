@@ -7,6 +7,7 @@ use SteveEngine\Validate\FieldType;
 class Field{
     public $name;
     public $label;
+    public $list = [];
     public $type = FieldType::TEXT;
     public $outputType = "string";
     public $isRequired = false;
@@ -40,8 +41,8 @@ class Field{
         return $this;
     }
 
-    public function required() : Field{
-        $this->isRequired = true;
+    public function required(bool $isRequired = true) : Field{
+        $this->isRequired = $isRequired;
         return $this;
     }
 
@@ -73,6 +74,11 @@ class Field{
         return $this;
     }
 
+    public function list(array $list) : Field{
+        $this->list = $list;
+        return $this;
+    }
+
     public static function taxNumber() : Field{
         $newField = new self();
         $newField
@@ -83,6 +89,26 @@ class Field{
         return $newField;
     }
 
+    public static function euTaxNumber() : Field{
+        $newField = new self();
+        $newField
+            ->name("taxNumber")
+            ->label("Adószám")
+            ->type(FieldType::TEXT)
+            ->pattern("/^[a-z]{2}[0-9]{8}$/");
+        return $newField;
+    }
+
+    public static function taxIdentification() : Field{
+        $newField = new self();
+        $newField
+            ->name("taxIdentification")
+            ->label("Adóazonosító")
+            ->type(FieldType::TEXT)
+            ->pattern("/^[0-9]{10}$/");
+        return $newField;
+    }
+
     public static function bankAccountNumber() : Field{
         $newField = new self();
         $newField
@@ -90,6 +116,16 @@ class Field{
             ->label("Bankszámlaszám")
             ->type(FieldType::TEXT)
             ->pattern("/^[0-9]{8}(-[0-9]{8}){1,2}$/");
+        return $newField;
+    }
+
+    public static function tajCardNumber() : Field{
+        $newField = new self();
+        $newField
+            ->name("tajCardNumber")
+            ->label("TAJ-szám")
+            ->type(FieldType::TEXT)
+            ->pattern("/^[0-9]{9}$/");
         return $newField;
     }
 
@@ -127,15 +163,75 @@ class Field{
         return $newField;
     }
 
-    public static function number() : Field{
+    public static function number(int $min = 0, int $max = 100) : Field{
         $newField = new self();
-        $newField->type(FieldType::INTEGER)->pattern("/^[0]{1}|[0-9]{1,10}$/");
+        $newField
+            ->min($min)
+            ->max($max)
+            ->type(FieldType::INTEGER);
         return $newField;
     }
 
     public static function someName() : Field{
         $newField = new self();
-        $newField->type(FieldType::TEXT)->maxLength(100)->pattern("/^[a-zöüóőúéáí-]{5,20}$/i");
+        $newField->type(FieldType::TEXT)->maxLength(100)->pattern("/^[ a-zöüóőúéáí0-9-\.'\"_]*$/ui");
+        return $newField;
+    }
+    
+    public static function communityTaxNumber() : Field{
+        $newField = new self();
+        $newField
+            ->label("Közösségi adószám")
+            ->pattern("/^[a-z]{2}|[0-9]{8}$/i");
+        return $newField;
+    }
+
+    public static function companyRegistrationCode() : Field{
+        $newField = new self();
+        $newField
+            ->label("Cégjegyzékszám")
+            ->pattern("/^[0-9]{2}-[0-9]{2}-[0-9]{6}$/");
+        return $newField;
+    }
+
+    public static function someText(int $maxLength = 100) : Field{
+        $newField = new self();
+        $newField
+            ->maxLength($maxLength)
+            ->pattern("/^[ a-zöüóúőűáéí0-9_,;\+\-\.'\/\?~:\(\)]*$/ui");
+        return $newField;
+    }
+
+    public static function multiRowText(int $maxLength = 100) : Field{
+        $newField = new self();
+        $newField
+            ->maxLength($maxLength)
+            ->pattern("/^[ a-zöüóúőűáéí0-9\-_\.'\/\?]*$/uim");
+        return $newField;
+    }
+
+    public static function date() : Field{
+        $newField = new self();
+        $newField
+            ->type(FieldType::DATE)
+            ->pattern("/^\d{4}[\-\/\s]?((((0[13578])|(1[02]))[\-\/\s]?(([0-2][0-9])|(3[01])))|(((0[469])|(11))[\-\/\s]?(([0-2][0-9])|(30)))|(02[\-\/\s]?[0-2][0-9]))$/")
+            ->message("Nem megfelelő formátum.");
+        return $newField;
+    }
+
+    public static function dateTime() : Field{
+        $newField = new self();
+        $newField
+            ->type(FieldType::TEXT)
+            ->pattern("/^(?=\d)(?:(?:1[6-9]|[2-9]\d)?\d\d([-.\/])(?:1[012]|0?[1-9])\1(?:31(?<!.(?:0[2469]|11))|(?:30|29)(?<!.02)|29(?=.0?2.(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(?:\x20|$))|(?:2[0-8]|1\d|0?[1-9]))(?:(?=\x20\d)\x20|$))?(((0?[1-9]|1[012])(:[0-5]\d){0,2}(\x20[AP]M))|([01]\d|2[0-3])(:[0-5]\d){1,2})?$/m")
+            ->message("Nem megfelelő formátum.");
+        return $newField;
+    }
+
+    public static function float() : Field{
+        $newField = new self();
+        $newField
+            ->type(FieldType::FLOAT);
         return $newField;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace SteveEngine\Safety;
 
+use SteveEngine\Convert\Sha3;
 use SteveEngine\Data\Model;
 use SteveEngine\Validate\Field;
 
@@ -10,45 +11,21 @@ use SteveEngine\Validate\Field;
  * @package SteveEngine\Safety
  */
 class User extends Model{
-    /**
-     * @var int
-     */
-    public int $id;
-    /**
-     * @var string
-     */
-    public string $name;
-    /**
-     * @var string
-     */
-    public string $email;
-    /**
-     * @var string
-     */
-    public string $monogram;
-    /**
-     * @var string
-     */
-    public ?string $image;
-    /**
-     * @var string
-     */
-    public string $passwordHash;
-    /**
-     * @var string
-     */
-    public string $permissions;
+    public static $tableName = "users";
 
-    /**
-     * @return User
-     */
+    public int      $id;
+    public string   $name;
+    public string   $email;
+    public string   $monogram;
+    public ?string  $image;
+    public string   $passwordHash;
+    public string   $permissions;
+    public ?string  $startPage;
+
     public static function new() : User{
         return new self();
     }
 
-    /**
-     * @return array
-     */
     public static function getFieldsForLogin() : array{
         return [
             "email"     => Field::emailAddress()->message("Nem megfelelő emailcím."),
@@ -56,7 +33,119 @@ class User extends Model{
         ];
     }
 
+    public static function getFieldsForChangePassword() : array{
+        return [
+            "password"      => Field::password()->label("Új jelszó")->message("A jelszó 5-20 karekter lehet és betűket, számokat tartalmazhat.")->required(),
+            "passwordAgain" => Field::password()->label("Új jelszó megismétlése")->message("A jelszó 5-20 karekter lehet és betűket, számokat tartalmazhat.")->required(),
+        ];
+    }
+
     public function getPermissions() : array{
         return json_decode($this->permissions, 1);
+    }
+
+    public static function changePassword() {
+        $password = request()->only("oldPassword");
+        $passwordHash = Sha3::hash($password, 512);
+
+        if ($passwordHash !== request()->user->passwordHash) {
+            throw new \Exception(json_encode(["oldPassword" => "A jelenlegi jelszó hibás."]), 422);
+        }
+
+        $data = request()->all();
+        if (validate()->fields(self::getFieldsForChangePassword())->check($data)) {
+            if ($data["password"] === $data["passwordAgain"]) {
+                $user = request()->user;
+                $user->passwordHash = Sha3::hash($data["password"], 512);
+                $user->update();
+            } else {
+                throw new \Exception(json_encode(["password" => "Az új jelszó és a megismételt jelszó nem egyezik."]), 422);
+            }
+        } else {
+            throw new \Exception(json_encode(validate()->getErrors()), 422);
+        }
+    }
+
+    public function closeWidget(int $id) {
+        $widgets = json_decode($this->startPage, 1);
+
+        foreach ($widgets as $index => $widgetGroup) {
+            foreach ($widgetGroup["widgets"] as $widgetIndex => $widget) {
+                if ((int)$widget["id"] === $id) {
+                    if (count($widgetGroup["widgets"]) === 1) {
+                        unset ($widgets[$index]);
+                    } else {
+                        unset ($widgets[$index]["widgets"][$widgetIndex]);
+                    }
+                    break 2;
+                }
+            }
+        }
+
+        $this->startPage = json_encode($widgets);
+        $this->update();
+
+        return [];
+    }
+
+    public function addGroup(string $title) {
+        $widgets    = json_decode($this->startPage, 1);
+        $widgets[]  = [
+            "label"     => $title,
+            "widgets"   => []
+        ];
+
+        $this->startPage = json_encode($widgets);
+        $this->update();
+
+        return [];
+    }
+
+    public function removeGroup(string $title) {
+        $widgets = json_decode($this->startPage, 1);
+
+        foreach ($widgets as $index => $widgetGroup) {
+            if ($widgetGroup["label"] === $title) {
+                unset ($widgets[$index]);
+                break;
+            }
+        }
+
+        $this->startPage = json_encode($widgets);
+        $this->update();
+
+        return [];
+    }
+
+    public function displayedWidgets() {
+        $result     = [];
+        $widgets    = json_decode($this->startPage, 1);
+
+        foreach ($widgets as $widgetGroup) {
+            foreach ($widgetGroup["widgets"] as $widget) {
+                array_push($result, $widget["id"]);
+            }
+        }
+
+        return $result;
+    }
+
+    public function addWidget(string $group, int $widgetId) {
+        $widgets    = json_decode($this->startPage, 1);
+
+        foreach ($widgets as $index => $widgetGroup) {
+            if ($widgetGroup["label"] === $group) {
+                $widgets[$index]["widgets"][] = [
+                    "id"    => $widgetId,
+                ];
+
+                break;
+            }
+        }
+
+        $this->startPage = json_encode($widgets);
+        $this->update();
+
+        return db()->query("select * from infoitems where id = $widgetId")->select()[0];
     }
 }
