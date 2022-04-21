@@ -14,7 +14,7 @@ class Menu{
     }
 
     private function getMenuItemsFromModuls() : array{
-        $userPermissions = request()->user->getPermissions();
+        $userPermissions = request()->user ? request()->user->getPermissions() : [];
         $menu   = [];
         $path   = config()->get("appPath") . DIRECTORY_SEPARATOR . "Moduls" . DIRECTORY_SEPARATOR . "*";
         $moduls = glob($path, GLOB_ONLYDIR);
