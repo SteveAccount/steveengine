@@ -11,11 +11,12 @@
   ],
   "autoload": {
     "psr-4": {
-      "System\\": "/Moduls/System",
-      "Site\\": "/Moduls/Site"
+      "System\\": "Moduls/System",
+      "Site\\": "Moduls/Site"
     }
   },
   "require": {
+    "twig/twig": "^1.6.5",
     "steveaccount/steveengine": "^v1.0.15"
   }
 }

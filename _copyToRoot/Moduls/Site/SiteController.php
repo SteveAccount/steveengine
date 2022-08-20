@@ -1,11 +1,11 @@
 <?php
 
-namespace System;
+namespace Site;
 
 use SteveEngine\ControllerForModulSystem;
 
 class SiteController extends ControllerForModulSystem{
     public function mainPage(){
-        return $this->twig->render("login.html.twig");
+        return $this->twig->render("main.html.twig");
     }
 }
