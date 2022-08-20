@@ -1,0 +1,21 @@
+{
+  "name": "vendor_name/se",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Steve",
+      "email": "email@example.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "System\\": "/Moduls/System",
+      "Site\\": "/Moduls/Site"
+    }
+  },
+  "require": {
+    "steveaccount/steveengine": "^v1.0.15"
+  }
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="/Public/css/notify.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/Public/js/DataService.js"></script>
+    <script src="/Public/js/Notify.js"></script>
+  <style>
+      *{box-sizing: border-box; margin: 0;}
+      body{display: flex; height: 100vh; justify-content: center; align-items: center;}
+      .container{padding: 2rem 3rem; box-shadow: 0 0 10px lightgray; font-family: Arial, serif ;}
+      .flexCol{display: flex; flex-direction: column;}
+      .flexRow{display: flex;}
+      .justifyContentCenter{justify-content: center;}
+      .padding-1rem-tb{padding: 1rem 0;}
+      input{border: 1px solid lightgray; font-size: 1.2rem; padding: 4px 10px;}
+      button{padding: 6px 20px; }
+      .warning{border: 1px solid red;}
+  </style>
+</head>
+<body>
+    <form>
+        <div class="flexCol container">
+            <div class="flexRow justifyContentCenter">
+                <h2>Bejelentkezés</h2>
+            </div>
+            <div class="flexCol padding-1rem-tb">
+                <span>Email</span>
+                <input type="text" name="email">
+            </div>
+            <div class="flexCol padding-1rem-tb">
+                <span>Jelszó</span>
+                <input type="password" name="password">
+            </div>
+            <div class="flexCol padding-1rem-tb">
+                <button type="button">OK</button>
+            </div>
+        </div>
+    </form>
+<script>
+    let dataService = new DataService();
+    let notify      = new Notify();
+
+    $("body")
+        .on("mouseenter", "input", event => {
+            $(event.target).removeClass("warning");
+        })
+        .on("click", "button", event => {
+            console.log("klikk");
+            let data = {
+                email:      $("[name=email]").val(),
+                password:   $("[name=password]").val()
+            }
+            dataService.request("POST", "/wc/login", data, response => {
+                console.log(response);
+                window.location.href = "/wc";
+            }, error => {
+                notify.warning(JSON.parse(error.responseText));
+            });
+        })
+</script>
+</body>
+</html>
