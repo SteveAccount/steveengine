@@ -16,7 +16,6 @@
     }
   },
   "require": {
-    "twig/twig": "^1.6.5",
     "steveaccount/steveengine": "^v1.0.15"
   }
 }
