@@ -18,6 +18,8 @@ use SteveEngine\Data\Setup;
 use SteveEngine\Router\Map;
 use SteveEngine\Router\Router;
 use SteveEngine\Safety\Request;
+use Site\SiteController;
+use System\SystemController;
 
 //Az autoloader indítása
 include "vendor/autoload.php";
@@ -45,31 +47,12 @@ Database::new()->prepare(config()->get("databaseInfo")["main"]);
 //A Router osztály inicializálása, az útvonalak regisztrálása
 $router = Router::new();
 $router->map()
-    ->group     ("/wc", "", (new Map)
-        ->get   ("/login", "System\SystemController", "loginPage", "loginPage")
-        ->post  ("/login", "System\SystemController", "login", "login")
-        ->get   ("/registration", "System\SystemController", "regPage", "regPage")
-        ->post  ("/registration", "System\SystemController", "reg", "reg")
-        ->get   ("/", "Main\MainController", "mainPage", "mainPage")
-        ->get   ("/migration", "System\SystemController", "migration")
+    ->group     ("/", "", (new Map)
+        ->get   ("/", SiteController::class, "mainPage", "mainPage")
 
-        ->post  ("/globalSearch", "Main\MainController", "globalSearch")
+        ->get   ("/login", SystemController::class, "loginPage", "loginPage")
+        ->post  ("/login", SystemController::class, "login", "login")
 
-        ->post  ("/modalPartner", "Administry\AdministryController", "getModal", "getModalPartner", ["partnersWrite"])
-
-        ->group         ("/administry", "", (new Map)
-            ->group     ("/partners", "", (new Map)
-                ->post  ("/partnerspage", "Administry\AdministryController", "partnersPage", "partnersPage", ["partnersRead", "partnersWrite"])
-                ->post  ("/getdata", "Administry\AdministryController", "getPartnersData", "getPartnersData", ["partnersRead", "partnersWrite"])
-                ->post  ("/newpartner", "Administry\AdministryController", "newPartner", "newPartner", ["partnersWrite"])
-            )
-
-            ->group     ("/myCompanies", "", (new Map)
-                ->post  ("/myCompaniesPage", "Administry\AdministryController", "myCompaniesPage", "myCompaniesPage", ["myCompaniesRead", "myCompaniesWrite"])
-                ->post  ("/getdata", "Administry\AdministryController", "getMyCompaniesData", "getMyCompaniesData", ["myCompaniesRead", "myCompaniesWrite"])
-                ->post  ("/newpartner", "Administry\AdministryController", "newPartner", "newPartner", ["myCompaniesWrite"])
-            )
-        )
     );
 
 //A Request osztály létrehozása, a session, a user és a permission ellenőrzése
