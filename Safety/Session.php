@@ -11,7 +11,7 @@ use SteveEngine\Data\Model;
  * @package SteveEngine\Safety
  */
 class Session extends Model{
-    public static $tableName = "session";
+    public static $tableName = "sessions";
     /**
      * @var int
      */

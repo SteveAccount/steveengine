@@ -9,9 +9,11 @@ abstract class Singleton {
 
     public static function new() {
         $class = get_called_class();
+
         if (!isset(self::$map[$class])) {
              self::$map[$class] = new $class();
         }
+
         return self::$map[$class];
     }
 }

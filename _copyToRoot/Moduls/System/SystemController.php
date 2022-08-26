@@ -25,4 +25,8 @@ class SystemController extends ControllerForModulSystem {
 
         return response("Hibás belépési adatok.", 422);
     }
+
+    public function error404() {
+        return $this->twig->render("error404.html.twig");
+    }
 }

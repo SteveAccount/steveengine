@@ -70,10 +70,14 @@ class Map{
      * @param Map $map
      * @return Map
      */
-    public function group(string $prefix, string $permission, Map $map) : Map{
+    public function group(string $prefix, array $permission, Map $map) : Map{
+        if ($prefix === "/") {
+            $prefix = "";
+        }
+
         foreach ($map->routes as $method => $routes){
             foreach ($routes as &$route){
-                $route->permission = $route->permission ?? $permission;
+                $route->permission = $route->permission === [] ? $permission : $route->permission;
                 if ($route->path !== "" && $route->path !== "/"){
                     $route->path = $prefix . $route->path;
                 } else{

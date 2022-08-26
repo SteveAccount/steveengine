@@ -53,6 +53,7 @@ $router->map()
         ->get   ("/login", SystemController::class, "loginPage", "loginPage")
         ->post  ("/login", SystemController::class, "login", "login")
 
+        ->get   ("/error404", SystemController::class, "error404", "error404")
     );
 
 //A Request osztály létrehozása, a session, a user és a permission ellenőrzése
