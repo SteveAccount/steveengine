@@ -1,17 +1,5 @@
 <?php
 
-/*
-Fontos!!!
-A vendor/steveaccount/steveengine/_copyToRoot mappa tartalmát be kell másolni a gyökérkönyvtárba.
-A composer.json fájlba be kell illeszteni a következőt:
-"autoload": {
-    "psr-4": {
-      "System\\": "Moduls/System"
-    }
-  }
-Majd frissítsd az autoloadert!
-*/
-
 use SteveEngine\Config;
 use SteveEngine\Data\Database;
 use SteveEngine\Data\Setup;
@@ -31,6 +19,13 @@ Config::new()
 
 //A közvetlen elérésű funckciók betöltése
 include "vendor/steveaccount/steveengine/Kernel.php";
+
+// Hibák megjelenítése
+if (isDev()) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 //Az engine működéséhez szükséges adatbázis létrehozása
 //Az első alkalommal kell lefutnia.
@@ -53,7 +48,9 @@ $router->map()
         ->get   ("/login", SystemController::class, "loginPage", "loginPage")
         ->post  ("/login", SystemController::class, "login", "login")
 
+        // Errors
         ->get   ("/error404", SystemController::class, "error404", "error404")
+        ->get   ("/error403", SystemController::class, "error403", "error403")
     );
 
 //A Request osztály létrehozása, a session, a user és a permission ellenőrzése

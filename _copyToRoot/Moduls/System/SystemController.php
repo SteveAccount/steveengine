@@ -29,4 +29,8 @@ class SystemController extends ControllerForModulSystem {
     public function error404() {
         return $this->twig->render("error404.html.twig");
     }
+
+    public function error403() {
+        return $this->twig->render("error403.html.twig");
+    }
 }

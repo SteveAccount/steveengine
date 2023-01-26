@@ -5,6 +5,10 @@ namespace SteveEngine\Data;
 abstract class Model{
     public static $tableName;
 
+    public static function new() {
+        return new static();
+    }
+
     public static function selectAll($orderBy = "") {
         $table = static::$tableName ?? self::getTablename();
 

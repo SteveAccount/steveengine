@@ -17,43 +17,48 @@ class Router extends Singleton{
         return $this->map;
     }
 
-    public function routeMe(){
+    public function routeMe() {
         $current    = request()->path();
         $method     = request()->method();
         $routes     = $this->map->routes[$method] ?? [];
         foreach ($routes as $route) {
-            if ($route->path === $current || ($route->path . "/") === $current){
-                $class = "";
-                
+            if ($route->path === $current || ($route->path . "/") === $current || $route->path === "/" . $current) {
                 $class = $route->class;
-                if (class_exists($class)){
-                    if (method_exists($class, $route->method)){
+
+                if (class_exists($class)) {
+                    if (method_exists($class, $route->method)) {
                         $method = $route->method;
-                        if ($myClass = new $class){
-                            if ($this->isPermissionOK($route, request()->user)){
+
+                        if ($myClass = new $class) {
+                            if ($this->isPermissionOK($route, request()->user)) {
                                 try{
                                     echo $myClass->$method();
-                                } catch(\Exception $e){
+                                } catch(\Exception $e) {
                                     db()->endTransaction(false);
                                     http_response_code($e->getCode());
                                     echo $e->getMessage();
                                 }
                                 return;
-                            }else{
-                                response("Nincs jogosultságod a funkcióhoz.", 403);
+                            } else {
+                                if (request()->user) {
+                                    redirect("error403");
+                                } else {
+                                    redirect("login");
+                                }
                             }
                         }
-                    } else{
+                    } else {
                         echo "Nincs ilyen funkció";
+                        exit;
                     }
-                } else{
+                } else {
                     echo "Nincs ilyen osztály";
+                    exit;
                 }
                 break;
             }
         }
-        echo "404";
-//        include \Config()->appPath . "/html/0404.html";
+        redirect("error404");
     }
 
     public function getPathByRouteName( string $name ) : ?string{

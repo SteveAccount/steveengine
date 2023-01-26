@@ -150,3 +150,11 @@ function toLog($some, $isAppend = true){
     $fileContent    .= var_export($some, true);
     file_put_contents('log.php', $fileContent);
 }
+
+/**
+ * Return true if software state is "dev", else false.
+ * @return  bool
+ */
+function isDev() : bool {
+    return config()->get("mode") === "develope";
+}
