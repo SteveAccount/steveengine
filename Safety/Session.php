@@ -44,7 +44,7 @@ class Session extends Model{
      */
     public static function new(int $userId = 0) : Session{
         if ($userId !== 0){
-            $query = "delete from session where userId=$userId";
+            $query = "delete from sessions where userId=$userId";
             db()->query($query)->run();
         }
         $newSession                 = new self();
@@ -75,7 +75,7 @@ class Session extends Model{
         $hash = Sha3::hash(strtoupper(Sha3::hash( $base, 512)), 512);
         $this->token = $hash;
         db()
-            ->query( "update session set token=:token where sessionId=:sessionId")
+            ->query( "update sessions set token=:token where sessionId=:sessionId")
             ->params( ["token" => $hash, "sessionId" => $this->sessionId] )
             ->run();
         return $hash;
