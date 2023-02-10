@@ -77,6 +77,10 @@ class Request extends Singleton{
         //Ha nem kell a programhoz User, akkor mehet tovább.
         if (!config()->get("hasUser")){
             return true;
+        } else {
+            if (config()->get("noUserRoutes") && in_array($this->path, config()->get("noUserRoutes"))) {
+                return true;
+            }
         }
         
         //Ha a method GET, az útvonal loginPage vagy regPage, akkor mehet tovább.
