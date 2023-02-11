@@ -156,5 +156,5 @@ function toLog($some, $isAppend = true){
  * @return  bool
  */
 function isDev() : bool {
-    return config()->get("mode") === "develope";
+    return config()->get("mode") !== "product";
 }

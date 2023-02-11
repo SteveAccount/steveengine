@@ -37,7 +37,7 @@ if (isDev()) {
 //}
 
 //A Database osztály inicializálása
-Database::new()->prepare(config()->get("databaseInfo")["main"]);
+Database::new()->prepare(config()->get("databaseInfo")[config()->get("mode")]);
 
 //A Router osztály inicializálása, az útvonalak regisztrálása
 $router = Router::new();

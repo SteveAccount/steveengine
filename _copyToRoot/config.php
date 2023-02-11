@@ -4,23 +4,23 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
 return [
-    //Adatbázis kapcslatok
-//    "databaseInfo"              => [
-//        "main"                  => [
-//            "server"            => "localhost",
-//            "port"              => 3306,
-//            "username"          => "root",
-//            "password"          => "",
-//            "database"          => "himas"
-//        ],
-//    ],
+    "mode"                      => "develope", // develope, product, testServer
+
+    // Adatbázis kapcslatok
     "databaseInfo"              => [
-        "main"                  => [
+        "develope"              => [
             "server"            => "localhost",
             "port"              => 3306,
-            "username"          => "webcompa_himas",
-            "password"          => "himasAdmin",
-            "database"          => "webcompa_himas"
+            "username"          => "root",
+            "password"          => "",
+            "database"          => "healthdiary"
+        ],
+        "product"               => [
+            "server"            => "localhost",
+            "port"              => 3306,
+            "username"          => "webcompa_health",
+            "password"          => "healthAdmin",
+            "database"          => "webcompa_health"
         ],
     ],
 
