@@ -43,6 +43,7 @@ class Request extends Singleton{
      * @var Session
      */
     private Session $session;
+    public string $lang;
 
     /**
      * A Request osztály feltöltése.
@@ -62,6 +63,13 @@ class Request extends Singleton{
         $this->sessionId    = $_SESSION["sessionId"] ?? "";
         $this->csrf         = $_POST["csrf"] ?? "";
         $this->data         = $_POST + $_GET;
+
+        if (!isset($_SESSION["lang"])) {
+            $_SESSION["lang"] = config()->get("lang");
+        }
+
+        $this->lang = $_SESSION["lang"];
+
         return $this;
     }
 

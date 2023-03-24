@@ -5,6 +5,7 @@ use PHPMailer\PHPMailer\SMTP;
 
 return [
     "mode"                      => "develope", // develope, product, testServer
+    "lang"                      => "hu",
 
     // Adatbázis kapcslatok
     "databaseInfo"              => [
