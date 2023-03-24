@@ -5,9 +5,8 @@ use SteveEngine\Data\Database;
 use SteveEngine\IComparable;
 use SteveEngine\Router\Router;
 use SteveEngine\Safety\Request;
+use SteveEngine\Translate;
 use SteveEngine\Validate\Validate;
-use Admin\Services\Translate;
-
 
 /**
  * Returns a singleton Config class.

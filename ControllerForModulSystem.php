@@ -2,11 +2,11 @@
 
 namespace SteveEngine;
 
-use Admin\Services\Translate;
 use SteveEngine\Safety\Request;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
+use SteveEngine\Translate;
 
 abstract class ControllerForModulSystem{
     public string           $path;
