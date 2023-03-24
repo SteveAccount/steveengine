@@ -6,6 +6,7 @@ use SteveEngine\IComparable;
 use SteveEngine\Router\Router;
 use SteveEngine\Safety\Request;
 use SteveEngine\Validate\Validate;
+use Admin\Services\Translate;
 
 
 /**
@@ -39,6 +40,11 @@ function db() : Database{
  */
 function request() : Request{
     return Request::new();
+}
+
+function trans(string $huString) {
+    $translate = Translate::new();
+    return $translate->trans($huString);
 }
 
 function isPermission(string $permission) : bool {

@@ -2,6 +2,7 @@
 
 namespace SteveEngine;
 
+use Admin\Services\Translate;
 use SteveEngine\Safety\Request;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -16,6 +17,14 @@ abstract class ControllerForModulSystem{
         $path       = implode(DIRECTORY_SEPARATOR, [config()->get("appPath"), "Moduls", $parts[0], $folderInModul]);
         $loader     = new FilesystemLoader($path);
         $this->twig = new Environment($loader);
+        $this->twig->addFunction(new \Twig_SimpleFunction("trans", function($huString) {
+            if (request()->lang !== "hu") {
+                $translate = Translate::new();
+                return $translate->trans($huString);
+            }
+
+            return $huString;
+        }));
     }
 
     public function getData(string $functionName, string $where = ""){
