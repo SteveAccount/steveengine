@@ -3,10 +3,10 @@
 namespace SteveEngine;
 
 use SteveEngine\Safety\Request;
+use SteveEngine\Translate;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
-use SteveEngine\Translate;
 
 abstract class ControllerForModulSystem{
     public string           $path;
@@ -18,12 +18,8 @@ abstract class ControllerForModulSystem{
         $loader     = new FilesystemLoader($path);
         $this->twig = new Environment($loader);
         $this->twig->addFunction(new \Twig_SimpleFunction("trans", function($huString) {
-            if (request()->lang !== "hu") {
-                $translate = Translate::new();
-                return $translate->trans($huString);
-            }
-
-            return $huString;
+            $translate = Translate::new();
+            return $translate->trans($huString);
         }));
     }
 

@@ -9,20 +9,22 @@ class Translate extends Singleton {
     public ?array $dictionary   = null;
 
     public function trans(string $huString) {
-        if (!$this->dictionary) {
-            $this->dictionary = $this->loadDictionary();
-        }
-
-        if (isset($this->dictionary[$huString][request()->lang])) {
-            if ($this->dictionary[$huString][request()->lang] !== "") {
-                return $this->dictionary[$huString][request()->lang];
-            }
-        } else {
-            foreach ($this->languages as $language) {
-                $this->dictionary[$huString][$language] = "";
+        if (request()->lang !== "hu") {
+            if (!$this->dictionary) {
+                $this->dictionary = $this->loadDictionary();
             }
 
-            file_put_contents("dictionary.json", json_encode($this->dictionary, JSON_UNESCAPED_UNICODE));
+            if (isset($this->dictionary[$huString][request()->lang])) {
+                if ($this->dictionary[$huString][request()->lang] !== "") {
+                    return $this->dictionary[$huString][request()->lang];
+                }
+            } else {
+                foreach ($this->languages as $language) {
+                    $this->dictionary[$huString][$language] = "";
+                }
+
+                file_put_contents("dictionary.json", json_encode($this->dictionary, JSON_UNESCAPED_UNICODE));
+            }
         }
 
         return $huString;
