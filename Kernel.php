@@ -5,8 +5,8 @@ use SteveEngine\Data\Database;
 use SteveEngine\IComparable;
 use SteveEngine\Router\Router;
 use SteveEngine\Safety\Request;
+use SteveEngine\Translate;
 use SteveEngine\Validate\Validate;
-
 
 /**
  * Returns a singleton Config class.
@@ -39,6 +39,11 @@ function db() : Database{
  */
 function request() : Request{
     return Request::new();
+}
+
+function trans(string $huString) {
+    $translate = Translate::new();
+    return $translate->trans($huString);
 }
 
 function isPermission(string $permission) : bool {
@@ -149,4 +154,12 @@ function toLog($some, $isAppend = true){
     $fileContent    .= "\n\n" . (new DateTime())->format("Y-m-d H:i:s") . "\n";
     $fileContent    .= var_export($some, true);
     file_put_contents('log.php', $fileContent);
+}
+
+/**
+ * Return true if software state is "dev", else false.
+ * @return  bool
+ */
+function isDev() : bool {
+    return config()->get("mode") !== "product";
 }

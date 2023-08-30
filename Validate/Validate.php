@@ -109,7 +109,7 @@ class Validate extends Singleton {
             $inputData[$password1] = password_hash($inputData[$password1], 1);
         }else{
             if ($message != ""){
-                $this->errors[$password2] = $_message;
+                $this->errors[$password2] = $message;
             }
         }
     }
@@ -119,6 +119,10 @@ class Validate extends Singleton {
      */
     public function getErrors():array{
         return $this->errors;
+    }
+
+    public function addError(string $key, string $error) {
+        $this->errors[$key] = $error;
     }
 }
 

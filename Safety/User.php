@@ -66,86 +66,131 @@ class User extends Model {
         }
     }
 
-    public function closeWidget(int $id) {
-        $widgets = json_decode($this->startPage, 1);
+    public function generatePassword() {
+        $countOfLower   = 0;
+        $countOfUpper   = 0;
+        $countOfNumber  = 0;
+        $countOfSpecial = 0;
+        $types          = ["lower", "upper", "number", "special"];
+        $chars          = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "x", "y", "w", "z"];
+        $numbers        = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+        $specials       = ["-", "_", "!", "+", "/", "=", "(", ")"];
 
-        foreach ($widgets as $index => $widgetGroup) {
-            foreach ($widgetGroup["widgets"] as $widgetIndex => $widget) {
-                if ((int)$widget["id"] === $id) {
-                    if (count($widgetGroup["widgets"]) === 1) {
-                        unset ($widgets[$index]);
-                    } else {
-                        unset ($widgets[$index]["widgets"][$widgetIndex]);
+        $passwordRules  = config()->get("passwordRules");
+        $password       = "";
+        do {
+            $type = $types[rand(0, 3)];
+            switch($type) {
+                case "lower":
+                    if ($countOfLower < $passwordRules["lowers"]) {
+                        $password .= $chars[rand(0, 25)];
+                        $countOfLower++;
                     }
-                    break 2;
-                }
+                    break;
+                case "upper":
+                    if ($countOfUpper < $passwordRules["uppers"]) {
+                        $password .= strtoupper($chars[rand(0, 25)]);
+                        $countOfUpper++;
+                    }
+                    break;
+                case "number":
+                    if ($countOfNumber < $passwordRules["numbers"]) {
+                        $password .= $numbers[rand(0, 9)];
+                        $countOfNumber++;
+                    }
+                    break;
+                case "special":
+                    if ($countOfSpecial < $passwordRules["specials"]) {
+                        $password .= $specials[rand(0, 7)];
+                        $countOfSpecial++;
+                    }
             }
-        }
 
-        $this->startPage = json_encode($widgets);
-        $this->update();
+        } while (!($countOfLower === $passwordRules["lowers"] && $countOfNumber === $passwordRules["numbers"] && $countOfSpecial === $passwordRules["specials"] && $countOfUpper === $passwordRules["uppers"]));
 
-        return [];
+        return $password;
     }
 
-    public function addGroup(string $title) {
-        $widgets    = json_decode($this->startPage, 1);
-        $widgets[]  = [
-            "label"     => $title,
-            "widgets"   => []
-        ];
-
-        $this->startPage = json_encode($widgets);
-        $this->update();
-
-        return [];
-    }
-
-    public function removeGroup(string $title) {
-        $widgets = json_decode($this->startPage, 1);
-
-        foreach ($widgets as $index => $widgetGroup) {
-            if ($widgetGroup["label"] === $title) {
-                unset ($widgets[$index]);
-                break;
-            }
-        }
-
-        $this->startPage = json_encode($widgets);
-        $this->update();
-
-        return [];
-    }
-
-    public function displayedWidgets() {
-        $result     = [];
-        $widgets    = json_decode($this->startPage, 1);
-
-        foreach ($widgets as $widgetGroup) {
-            foreach ($widgetGroup["widgets"] as $widget) {
-                array_push($result, $widget["id"]);
-            }
-        }
-
-        return $result;
-    }
-
-    public function addWidget(string $group, int $widgetId) {
-        $widgets    = json_decode($this->startPage, 1);
-
-        foreach ($widgets as $index => $widgetGroup) {
-            if ($widgetGroup["label"] === $group) {
-                $widgets[$index]["widgets"][] = [
-                    "id"    => $widgetId,
-                ];
-
-                break;
-            }
-        }
-
-        $this->startPage = json_encode($widgets);
-        $this->update();
-
-        return db()->query("select * from infoitems where id = $widgetId")->select()[0];
-    }
+//    public function closeWidget(int $id) {
+//        $widgets = json_decode($this->startPage, 1);
+//
+//        foreach ($widgets as $index => $widgetGroup) {
+//            foreach ($widgetGroup["widgets"] as $widgetIndex => $widget) {
+//                if ((int)$widget["id"] === $id) {
+//                    if (count($widgetGroup["widgets"]) === 1) {
+//                        unset ($widgets[$index]);
+//                    } else {
+//                        unset ($widgets[$index]["widgets"][$widgetIndex]);
+//                    }
+//                    break 2;
+//                }
+//            }
+//        }
+//
+//        $this->startPage = json_encode($widgets);
+//        $this->update();
+//
+//        return [];
+//    }
+//
+//    public function addGroup(string $title) {
+//        $widgets    = json_decode($this->startPage, 1);
+//        $widgets[]  = [
+//            "label"     => $title,
+//            "widgets"   => []
+//        ];
+//
+//        $this->startPage = json_encode($widgets);
+//        $this->update();
+//
+//        return [];
+//    }
+//
+//    public function removeGroup(string $title) {
+//        $widgets = json_decode($this->startPage, 1);
+//
+//        foreach ($widgets as $index => $widgetGroup) {
+//            if ($widgetGroup["label"] === $title) {
+//                unset ($widgets[$index]);
+//                break;
+//            }
+//        }
+//
+//        $this->startPage = json_encode($widgets);
+//        $this->update();
+//
+//        return [];
+//    }
+//
+//    public function displayedWidgets() {
+//        $result     = [];
+//        $widgets    = json_decode($this->startPage, 1);
+//
+//        foreach ($widgets as $widgetGroup) {
+//            foreach ($widgetGroup["widgets"] as $widget) {
+//                array_push($result, $widget["id"]);
+//            }
+//        }
+//
+//        return $result;
+//    }
+//
+//    public function addWidget(string $group, int $widgetId) {
+//        $widgets    = json_decode($this->startPage, 1);
+//
+//        foreach ($widgets as $index => $widgetGroup) {
+//            if ($widgetGroup["label"] === $group) {
+//                $widgets[$index]["widgets"][] = [
+//                    "id"    => $widgetId,
+//                ];
+//
+//                break;
+//            }
+//        }
+//
+//        $this->startPage = json_encode($widgets);
+//        $this->update();
+//
+//        return db()->query("select * from infoitems where id = $widgetId")->select()[0];
+//    }
 }
