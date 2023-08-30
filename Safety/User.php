@@ -10,7 +10,7 @@ use SteveEngine\Validate\Field;
  * Class User
  * @package SteveEngine\Safety
  */
-class User extends Model{
+class User extends Model {
     public static $tableName = "users";
 
     public int      $id;
@@ -22,18 +22,18 @@ class User extends Model{
     public string   $permissions;
     public ?string  $startPage;
 
-    public static function new() : User{
+    public static function new() : User {
         return new self();
     }
 
-    public static function getFieldsForLogin() : array{
+    public static function getFieldsForLogin() : array  {
         return [
             "email"     => Field::emailAddress()->message("Nem megfelelő emailcím."),
             "password"  => Field::password()->message("A jelszó 5-20 karekter lehet és betűket, számokat tartalmazhat.")
         ];
     }
 
-    public static function getFieldsForChangePassword() : array{
+    public static function getFieldsForChangePassword() : array {
         return [
             "password"      => Field::password()->label("Új jelszó")->message("A jelszó 5-20 karekter lehet és betűket, számokat tartalmazhat.")->required(),
             "passwordAgain" => Field::password()->label("Új jelszó megismétlése")->message("A jelszó 5-20 karekter lehet és betűket, számokat tartalmazhat.")->required(),

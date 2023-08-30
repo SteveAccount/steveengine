@@ -56,6 +56,11 @@ class Validate extends Singleton {
                     if ($field->isRequired === true && $value === ""){
                         throw new \Exception($field->label . " - Kötelező mező");
                     } else{
+                        // Checked ellenőrzése
+                        if ($field->name === "checked" && $value !== "true") {
+                            toLog("checked");
+                            throw new \Exception($field->label . " - " . $field->message);
+                        }
                         if ($value !== ""){
                             //Pattern ellenőrzése, ha van
                             if ($field->pattern){

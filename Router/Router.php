@@ -6,21 +6,20 @@ use SteveEngine\Config;
 use SteveEngine\Safety\User;
 use SteveEngine\Singleton;
 
-class Router extends Singleton{
-    /**
-     * @var Map
-     */
+class Router extends Singleton {
     public Map $map;
 
-    public function map() : Map{
+    public function map() : Map {
         $this->map = new Map();
+
         return $this->map;
     }
 
-    public function routeMe(){
+    public function routeMe() {
         $current    = request()->path();
         $method     = request()->method();
         $routes     = $this->map->routes[$method] ?? [];
+
         foreach ($routes as $route) {
             if ($route->path === $current || ($route->path . "/") === $current){
                 $class = "";

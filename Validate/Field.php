@@ -151,6 +151,17 @@ class Field{
         return $newField;
     }
 
+    public static function passwordHash() : Field{
+        $newField = new self();
+        $newField
+            ->name("password")
+            ->label("Jelszó")
+            ->type(FieldType::PASSWORD)
+            ->maxLength(200)
+            ->pattern("/^[a-z0-9]{5,200}$/i");
+        return $newField;
+    }
+
     public static function repeatPassword() : Field{
         $newField = new self();
         $newField->name("repeatPassword")->label("Jelszó megismétlése")->type(FieldType::PASSWORD)->maxLength(20)->pattern("/^[a-z0-9]{5,20}$/");
@@ -232,6 +243,13 @@ class Field{
         $newField = new self();
         $newField
             ->type(FieldType::FLOAT);
+        return $newField;
+    }
+
+    public static function checked() : Field{
+        $newField = new self();
+        $newField
+            ->pattern("/^true$/");
         return $newField;
     }
 }
