@@ -6,14 +6,12 @@ use SteveEngine\Config;
 use SteveEngine\Safety\User;
 use SteveEngine\Singleton;
 
-class Router extends Singleton{
-    /**
-     * @var Map
-     */
+class Router extends Singleton {
     public Map $map;
 
-    public function map() : Map{
+    public function map() : Map {
         $this->map = new Map();
+
         return $this->map;
     }
 
