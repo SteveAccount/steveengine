@@ -21,7 +21,7 @@
   },
   "extra": {
     "my-custom-files": [
-      "/_copyToRoot/*"
+      "/_copyToRoot/index.php"
     ]
   }
 }
