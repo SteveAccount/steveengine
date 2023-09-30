@@ -23,5 +23,10 @@
     "my-custom-files": [
       "/_copyToRoot/index.php"
     ]
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "cp /_copyToRoot/config.php /project"
+    ]
   }
 }
