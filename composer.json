@@ -20,8 +20,8 @@
     "ext-json": "*"
   },
   "extra": {
-    "copy-file": {
-      "vendor/steveaccount/steveengine/index.php": "index.php"
-    }
+    "post-package-install": [
+      "php -r \"copy('vendor/steveaccount/steveengine/index.php', 'index.php');\""
+    ]
   }
 }
