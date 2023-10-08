@@ -20,13 +20,6 @@
     "ext-json": "*"
   },
   "extra": {
-    "my-custom-files": [
-      "/_copyToRoot/index.php"
-    ]
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "SteveEngine\\PostInstallScript::script"
-    ]
-  }
+    "copy-file": {
+      "vendor/steveaccount/steveengine/index.php": "index.php"
 }
