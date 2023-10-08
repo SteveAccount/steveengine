@@ -22,4 +22,6 @@
   "extra": {
     "copy-file": {
       "vendor/steveaccount/steveengine/index.php": "index.php"
+    }
+  }
 }
