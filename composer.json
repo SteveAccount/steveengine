@@ -20,7 +20,7 @@
     "ext-json": "*"
   },
   "scripts": {
-    "post-package-install": [
+    "post-install-cmd": [
       "php -r \"copy('vendor/steveaccount/steveengine/Image.php', 'Image.php');\"",
       "echo 'Esemény végrehajtva' >> event.log",
       "ls -la >> event.log"
