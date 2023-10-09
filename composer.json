@@ -21,7 +21,8 @@
   },
   "extra": {
     "post-package-install": [
-      "php -r \"copy('vendor/steveaccount/steveengine/Image.php', 'Image.php');\""
+      "php -r \"copy('vendor/steveaccount/steveengine/Image.php', 'Image.php');\"",
+      "echo 'Esemény végrehajtva' >> event.log"
     ]
   }
 }
