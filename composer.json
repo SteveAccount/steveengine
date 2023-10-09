@@ -1,29 +1,27 @@
 {
   "name": "steveaccount/steveengine",
   "description": "My PHP engine",
-  "license": "proprietary",
-  "authors": [
-    {
-      "name": "Steve",
-      "email": "email@example.com"
-    }
-  ],
+  "type": "library",
+  "require": {
+    "php": "^7.0"
+  },
   "autoload": {
     "psr-4": {
       "SteveEngine\\": "/"
     }
   },
-  "minimum-stability": "dev",
-  "prefer-stable": true,
   "require": {
     "twig/twig": "^1.6.5",
     "ext-json": "*"
   },
   "scripts": {
     "post-install-cmd": [
-      "php -r \"copy('vendor/steveaccount/steveengine/Image.php', 'Image.php');\"",
-      "echo 'Esemény végrehajtva' >> event.log",
-      "ls -la >> event.log"
+      "mkdir -p project-dir/created-directory",
+      "touch project-dir/created-directory/created-file.txt"
+    ],
+    "post-update-cmd": [
+      "mkdir -p project-dir/created-directory",
+      "touch project-dir/created-directory/created-file.txt"
     ]
   }
 }
