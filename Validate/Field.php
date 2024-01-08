@@ -7,13 +7,15 @@ use SteveEngine\Validate\FieldType;
 class Field{
     public $name;
     public $label;
-    public $list = [];
-    public $type = FieldType::TEXT;
-    public $outputType = "string";
-    public $isRequired = false;
+    public $list        = [];
+    public $type        = FieldType::TEXT;
+    public $outputType  = "string";
+    public $isRequired  = false;
+    public $isUnique    = false;
+    public $tableName   = "";
     public $min;
     public $max;
-    public $maxLength = 100;
+    public $maxLength   = 100;
     public $pattern;
     public $message;
 
@@ -43,6 +45,13 @@ class Field{
 
     public function required(bool $isRequired = true) : Field{
         $this->isRequired = $isRequired;
+        return $this;
+    }
+
+    public function unique(string $tableName) : Field {
+        $this->isUnique     = true;
+        $this->tableName    = $tableName;
+
         return $this;
     }
 

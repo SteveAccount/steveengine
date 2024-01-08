@@ -12,7 +12,7 @@ class Email {
 
     public function __construct() {
         $this->mail = new PHPMailer(true);
-        $this->emailConfig();
+        $this->emailConfig(config()->get("email")[config()->get("mode")]);
     }
 
     public function address(string $address) : Email {
@@ -52,7 +52,7 @@ class Email {
         return $result;
     }
 
-    private function emailConfig() {
+    private function emailConfig(array $config) {
         if ($config["isSMTP"] === true) {
             $this->mail->isSMTP();
             $this->mail->Mailer     = "smtp";

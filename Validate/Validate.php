@@ -52,6 +52,16 @@ class Validate extends Singleton {
 
                 $values = is_array($fieldValue) ? $fieldValue : [$fieldValue];
                 foreach ($values as &$value){
+                    // Unique mező ellenőrzése
+                    if ($field->isUnique) {
+                        $query  = "select id from $field->tableName where $key = '$value'";
+                        $record = db()->query($query)->select();
+
+                        if ($record) {
+                            throw new \Exception($field->label . " - Egyedi mező, már van ilyen érték.");
+                        }
+                    }
+
                     //Kötelező mező ellenőrzése
                     if ($field->isRequired === true && $value === ""){
                         throw new \Exception($field->label . " - Kötelező mező");

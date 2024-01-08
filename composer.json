@@ -13,15 +13,5 @@
   "require": {
     "twig/twig": "^1.6.5",
     "ext-json": "*"
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "mkdir -p project-dir/created-directory",
-      "touch project-dir/created-directory/created-file.txt"
-    ],
-    "post-update-cmd": [
-      "mkdir -p project-dir/created-directory",
-      "touch project-dir/created-directory/created-file.txt"
-    ]
   }
 }

@@ -74,12 +74,12 @@ class Session extends Model {
      * @throws \Exception
      */
     public function newToken() : string {
-        $base = ( new \DateTime )->format( "Y-m-d H:i:s.v" );
-        $hash = Sha3::hash(strtoupper(Sha3::hash( $base, 512)), 512);
+        $base = (new \DateTime)->format("Y-m-d H:i:s.v");
+        $hash = Sha3::hash(strtoupper(Sha3::hash($base, 512)), 512);
         $this->token = $hash;
         db()
             ->query( "update sessions set token=:token where sessionId=:sessionId")
-            ->params( ["token" => $hash, "sessionId" => $this->sessionId] )
+            ->params(["token" => $hash, "sessionId" => $this->sessionId])
             ->run();
 
         return $hash;
@@ -90,8 +90,8 @@ class Session extends Model {
      * @throws \Exception
      */
     private function getSessionId() : string {
-        $base = ( new DateTime )->format( "Y-m-d H:i:s.v" );
+        $base = (new DateTime)->format("Y-m-d H:i:s.v");
 
-        return Sha3::hash( $base, 512);
+        return Sha3::hash($base, 512);
     }
 }
