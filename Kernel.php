@@ -149,11 +149,11 @@ function compareObject(IComparable $object1, IComparable $object2 ) : bool{
  * @param mixed $some
  * @param bool $isAppend
  */
-function toLog($some, $isAppend = true){
-    $fileContent     = $isAppend ? file_get_contents("log.php") : "";
+function toLog($some, $isAppend = true, $filename = "log.php"){
+    $fileContent     = $isAppend ? file_get_contents($filename) : "";
     $fileContent    .= "\n\n" . (new DateTime())->format("Y-m-d H:i:s") . "\n";
     $fileContent    .= var_export($some, true);
-    file_put_contents('log.php', $fileContent);
+    file_put_contents($filename, $fileContent);
 }
 
 /**
@@ -162,4 +162,42 @@ function toLog($some, $isAppend = true){
  */
 function isDev() : bool {
     return config()->get("mode") !== "product";
+}
+
+function removeDirectory(string $folder) {
+    if (! is_dir($folder)) {
+        throw new InvalidArgumentException("$folder must be a directory");
+    }
+    if (substr($folder, strlen($folder) - 1, 1) != '/') {
+        $folder .= '/';
+    }
+    
+    $files = glob($folder . '*', GLOB_MARK);
+    foreach ($files as $file) {
+        if (is_dir($file)) {
+            removeDirectory($file);
+        } else {
+            unlink($file);
+        }
+    }
+    
+    rmdir($folder);
+}
+
+function getSettings(?string $key = null) {
+    if ($key) {
+        $query = "select * from settings where settingKey = '$key'";
+
+        return db()->query($query)->scalar("settingValue");
+    } else {
+        $query      = "select * from settings";
+        $settings   = db()->query($query)->select();
+        $result     = [];
+
+        foreach ($settings as $setting) {
+            $result[$setting->settingKey] = json_decode($setting->settingValue);
+        }
+
+        return $result;
+    }
 }

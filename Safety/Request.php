@@ -52,20 +52,18 @@ class Request extends Singleton{
     public function prepare() : Request{
         session_start();
 
-        $this->method   = strtolower( $_POST["_method"] ?? $_SERVER["REQUEST_METHOD"] );
-        $index          = strpos($_SERVER["REQUEST_URI"], "?");
-        $requestUriWithoutAnchor = $_SERVER["REQUEST_URI"] !== '/'
+        $this->method               = strtolower( $_POST["_method"] ?? $_SERVER["REQUEST_METHOD"] );
+        $index                      = strpos($_SERVER["REQUEST_URI"], "?");
+        $requestUriWithoutAnchor    = $_SERVER["REQUEST_URI"] !== '/'
             ? rtrim(substr($_SERVER["REQUEST_URI"],strpos($_SERVER["REQUEST_URI"], "#")),"/")
-            : '/';
+            : "/";
 
-        $index          = strpos($requestUriWithoutAnchor, "?");
+        $index = strpos($requestUriWithoutAnchor, "?");
         if ($index){
             $this->path(substr($requestUriWithoutAnchor, 0, $index));
         } else{
             $this->path($requestUriWithoutAnchor);
         }
-
-
 
         if ($index){
             $this->path(substr($_SERVER["REQUEST_URI"], 0, $index));

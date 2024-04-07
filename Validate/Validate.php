@@ -16,7 +16,7 @@ class Validate extends Singleton {
     /**
      * @var array
      */
-    private array $errors = [];
+    public array $errors = [];
 
     /**
      * @param array $fields
@@ -82,9 +82,14 @@ class Validate extends Singleton {
                             //Ellenőrzés a mező típusa alapján
                             if ($field->list !== []){
                                 if (!in_array($value, $field->list)){
-                                    throw new \Exception($field->label . " - Az elem nem szerepel a listában.");
+                                    throw new \Exception($field->label . " - " . $field->message ?? "Az elem nem szerepel a listában.");
                                 }
                             } else{
+                                if ($field->type === "html") {
+                                    if ($field->checkFunction && call_user_func($field->checkFunction, $value)) {
+                                        throw new \Exception($field->label . " - A html-ben tiltott tartalom van.");
+                                    }
+                                }
                                 if ($field->type == "float"){
                                     $value = str_replace(",", ".", $value);
                                     $value = (float)$value;

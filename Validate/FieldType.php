@@ -10,4 +10,5 @@ class FieldType{
     public const BOOL       = "bool";
     public const FLOAT      = "float";
     public const DATE       = "date";
+    public const HTML       = "html";
 }
