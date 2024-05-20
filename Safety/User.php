@@ -66,7 +66,7 @@ class User extends Model {
         }
     }
 
-    public function generatePassword() {
+    public function generatePassword(array $passwordRules) {
         $countOfLower   = 0;
         $countOfUpper   = 0;
         $countOfNumber  = 0;
@@ -76,7 +76,10 @@ class User extends Model {
         $numbers        = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
         $specials       = ["-", "_", "!", "+", "/", "=", "(", ")"];
 
-        $passwordRules  = config()->get("passwordRules");
+        if (!$passwordRules) {
+            $passwordRules  = config()->get("passwordRules");
+        }
+
         $password       = "";
         do {
             $type = $types[rand(0, 3)];
@@ -111,86 +114,9 @@ class User extends Model {
         return $password;
     }
 
-//    public function closeWidget(int $id) {
-//        $widgets = json_decode($this->startPage, 1);
-//
-//        foreach ($widgets as $index => $widgetGroup) {
-//            foreach ($widgetGroup["widgets"] as $widgetIndex => $widget) {
-//                if ((int)$widget["id"] === $id) {
-//                    if (count($widgetGroup["widgets"]) === 1) {
-//                        unset ($widgets[$index]);
-//                    } else {
-//                        unset ($widgets[$index]["widgets"][$widgetIndex]);
-//                    }
-//                    break 2;
-//                }
-//            }
-//        }
-//
-//        $this->startPage = json_encode($widgets);
-//        $this->update();
-//
-//        return [];
-//    }
-//
-//    public function addGroup(string $title) {
-//        $widgets    = json_decode($this->startPage, 1);
-//        $widgets[]  = [
-//            "label"     => $title,
-//            "widgets"   => []
-//        ];
-//
-//        $this->startPage = json_encode($widgets);
-//        $this->update();
-//
-//        return [];
-//    }
-//
-//    public function removeGroup(string $title) {
-//        $widgets = json_decode($this->startPage, 1);
-//
-//        foreach ($widgets as $index => $widgetGroup) {
-//            if ($widgetGroup["label"] === $title) {
-//                unset ($widgets[$index]);
-//                break;
-//            }
-//        }
-//
-//        $this->startPage = json_encode($widgets);
-//        $this->update();
-//
-//        return [];
-//    }
-//
-//    public function displayedWidgets() {
-//        $result     = [];
-//        $widgets    = json_decode($this->startPage, 1);
-//
-//        foreach ($widgets as $widgetGroup) {
-//            foreach ($widgetGroup["widgets"] as $widget) {
-//                array_push($result, $widget["id"]);
-//            }
-//        }
-//
-//        return $result;
-//    }
-//
-//    public function addWidget(string $group, int $widgetId) {
-//        $widgets    = json_decode($this->startPage, 1);
-//
-//        foreach ($widgets as $index => $widgetGroup) {
-//            if ($widgetGroup["label"] === $group) {
-//                $widgets[$index]["widgets"][] = [
-//                    "id"    => $widgetId,
-//                ];
-//
-//                break;
-//            }
-//        }
-//
-//        $this->startPage = json_encode($widgets);
-//        $this->update();
-//
-//        return db()->query("select * from infoitems where id = $widgetId")->select()[0];
-//    }
+    public function hasPermission(string $permission) : bool {
+        $permissions = json_decode($this->permissions, 1);
+
+        return in_array($permission, $permissions);
+    }
 }

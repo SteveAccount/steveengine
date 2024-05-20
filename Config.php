@@ -6,7 +6,7 @@ namespace SteveEngine;
  * Class Config
  * @package SteveEngine
  */
-class Config extends Singleton{
+class Config extends Singleton {
     /**
      * @var array
      */
@@ -15,8 +15,9 @@ class Config extends Singleton{
     /**
      * @return Config
      */
-    public function prepare(){
+    public function prepare() {
         $this->settings = include ("./config.php");
+
         return $this;
     }
 
@@ -25,8 +26,9 @@ class Config extends Singleton{
      * @param string $value
      * @return Config
      */
-    public function set(string $name, string $value ){
+    public function set(string $name, string $value) {
         $this->settings[$name] = $value;
+
         return $this;
     }
 
@@ -34,7 +36,7 @@ class Config extends Singleton{
      * @param string $name
      * @return mixed|null
      */
-    public function get(string $name ){
+    public function get(string $name) {
         return $this->settings[$name] ?? null;
     }
 }

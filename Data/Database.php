@@ -7,7 +7,7 @@ use SteveEngine\Singleton;
 
 class Database extends Singleton{
     private $connectionInfo;
-    private \PDO $pdo;
+    public  \PDO $pdo;
     private $query;
     private $answer = "StdClass";
     private $params;

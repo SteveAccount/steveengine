@@ -2,11 +2,45 @@
 
 namespace SteveEngine\Data;
 
-abstract class Model{
+abstract class Model {
     public static $tableName;
 
     public static function new() {
         return new static();
+    }
+
+    public static function getModel(int $id) {
+        return (new static())::selectById($id);
+    }
+
+    public function moveModel(array $data) {
+        $tableName      = static::$tableName;
+        $newParentId    = (int)$data["newParentId"];
+        $newPosition    = (int)($data["newPosition"] ?? $this->getNext("orderIndex", ["parentId" => $newParentId]) - 1) + 1;
+
+        // A régi elem utáni elemek orderindexének csökkentése
+        $query = "
+            update $tableName
+            set orderIndex = orderIndex - 1
+            where parentId = $this->parentId and orderIndex > $this->orderIndex
+        ";
+        db()->query($query)->run();
+
+
+        // Az új helyen az orderindexek növelése
+        $query = "
+            update $tableName
+            set orderIndex = orderIndex + 1
+            where parentId = $newParentId and orderIndex >= $newPosition
+        ";
+        db()->query($query)->run();
+
+        // Az elem módosítása
+        $this->parentId     = $newParentId;
+        $this->orderIndex   = $newPosition;
+        $this->update();
+
+        return [];
     }
 
     public static function selectAll($orderBy = "") {
@@ -104,7 +138,8 @@ abstract class Model{
 
     public static function getListForSelect(string $idField = "id", string $nameField = "name") {
         $table = static::$tableName ?? self::getTablename();
-        $query = "select $idField, $nameField as text from $table where isActive = 1 order by text";
+        $query = "select $idField as id, $nameField as name from $table where isActive = 1 order by name";
+
         return db()->query($query)->select();
     }
 

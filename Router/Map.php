@@ -6,7 +6,7 @@ namespace SteveEngine\Router;
  * Class Map
  * @package HardtEngine\Router
  */
-class Map{
+class Map {
     /**
      * @var array $routes
      */
@@ -20,8 +20,9 @@ class Map{
      * @param array $permission
      * @return Map
      */
-    public function get(string $url, string $class, string $method, string $name = "", array $permission = []) : Map{
+    public function get(string $url, string $class, string $method, string $name = "", array $permission = []) : Map {
         $this->routes["get"][] = new Route($url, $class, $method, $name, $permission);
+
         return $this;
     }
 
@@ -33,8 +34,9 @@ class Map{
      * @param array $permission
      * @return Map
      */
-    public function post(string $url, string $class, string $method, string $name = "", array $permission = []) : Map{
+    public function post(string $url, string $class, string $method, string $name = "", array $permission = []) : Map {
         $this->routes["post"][] = new Route($url, $class, $method, $name, $permission);
+
         return $this;
     }
 
@@ -46,8 +48,9 @@ class Map{
      * @param array $permission
      * @return Map
      */
-    public function put(string $url, string $class, string $method, string $name = "", array $permission = []) : Map{
+    public function put(string $url, string $class, string $method, string $name = "", array $permission = []) : Map {
         $this->routes["put"][] = new Route($url, $class, $method, $name, $permission);
+
         return $this;
     }
 
@@ -59,8 +62,9 @@ class Map{
      * @param array $permission
      * @return Map
      */
-    public function delete(string $url, string $class, string $method, string $name = "", array $permission = []) : Map{
+    public function delete(string $url, string $class, string $method, string $name = "", array $permission = []) : Map {
         $this->routes["delete"][] = new Route($url, $class, $method, $name, $permission);
+
         return $this;
     }
 
@@ -70,7 +74,7 @@ class Map{
      * @param Map $map
      * @return Map
      */
-    public function group(string $prefix, array $permission, Map $map) : Map{
+    public function group(string $prefix, array $permission, Map $map) : Map {
         if ($prefix === "/") {
             $prefix = "";
         }
@@ -86,6 +90,7 @@ class Map{
                 $this->routes[$method][] = $route;
             }
         }
+
         return $this;
     }
 }

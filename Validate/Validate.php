@@ -85,17 +85,21 @@ class Validate extends Singleton {
                                     throw new \Exception($field->label . " - " . $field->message ?? "Az elem nem szerepel a listában.");
                                 }
                             } else{
-                                if ($field->type === "html") {
-                                    if ($field->checkFunction && call_user_func($field->checkFunction, $value)) {
-                                        throw new \Exception($field->label . " - A html-ben tiltott tartalom van.");
-                                    }
-                                }
-                                if ($field->type == "float"){
-                                    $value = str_replace(",", ".", $value);
-                                    $value = (float)$value;
-                                }
-                                if ($field->type == "boolean"){
-                                    $value = $value == "true";
+                                switch ($field->type) {
+                                    case "html":
+                                        if ($field->checkFunction && call_user_func($field->checkFunction, $value)) {
+                                            throw new \Exception($field->label . " - A html-ben tiltott tartalom van.");
+                                        }
+                                        break;
+                                    case "float":
+                                        $value = str_replace(",", ".", $value);
+                                        $value = (float)$value;
+                                        break;
+                                    case FieldType::INTEGER:
+                                        $value = (int)$value;
+                                        break;
+                                    case FieldType::BOOL:
+                                        $value = $value === "true";
                                 }
                             }
                         } else {

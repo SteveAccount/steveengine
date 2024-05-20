@@ -18,6 +18,7 @@ class Field{
     public $maxLength   = 100;
     public $pattern;
     public $message;
+    public $checkFunction;
 
     public static function new() : Field{
         return new self();
@@ -259,6 +260,32 @@ class Field{
         $newField = new self();
         $newField
             ->pattern("/^true$/");
+        return $newField;
+    }
+
+    public static function css(int $maxLength = 100) : Field{
+        $newField = new self();
+        $newField
+            ->maxLength($maxLength)
+            ->pattern("/^[ a-zöüóúőűáéí0-9_,;#\+\-\.'\/\?~:\(\)]*$/ui");
+        return $newField;
+    }
+
+    public static function url(int $maxLength = 200) : Field{
+        $newField = new self();
+        $newField
+            ->maxLength($maxLength)
+            ->pattern("/^[a-z0-9\-\.\/\?:]*$/");
+        return $newField;
+    }
+
+    public static function htmlContent() : Field {
+        $newField = new self();
+        $newField
+            ->type(FieldType::HTML)
+            ->checkFunction = function($value) {
+            return preg_match("(script|onclick|onchange|onmouse|onkey|onload)", $value) === 1;
+        };
         return $newField;
     }
 }

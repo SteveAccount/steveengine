@@ -6,6 +6,7 @@ class TreeNode{
     public $id;
     public $content;
     public $nodes;
+    public static $orphans = [];
 
     public function __construct( $id = 0, $content = null ){
         $this->id = $id;
@@ -23,8 +24,22 @@ class TreeNode{
                 if ( $node ){
                     $node->nodes[] = $subNode;
                 }
+                else {
+                    //Sometimes,there are orphan elems,whose parents not in the tree yet
+                    self::$orphans[$row->$idField] = $row;
+                }
             }
         }
+
+        /* ADD Orphans! */
+        foreach(self::$orphans as $orphan){
+            $orphanNode = new TreeNode( $orphan->$idField, $orphan );
+            $node = $this->findNodeById( $orphan->$parentField );
+            if ( $node ){
+                $node->nodes[] = $orphanNode;
+            }
+        }
+
         return $this;
     }
 

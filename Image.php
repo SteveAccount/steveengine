@@ -64,30 +64,35 @@ class Image{
             $requiredHeight = $size[1];
             $imageWidth     = $this->imageInfo[0];
             $imageHeight    = $this->imageInfo[1];
-            
+
             //Kell módosítani a képet?
-            if (!$canResizeIfLess && $requiredWidth > $imageWidth && $requiredHeight > $imageHeight){
+            if (!$canResizeIfLess && $requiredWidth > $imageWidth && $requiredHeight > $imageHeight) {
                 return $this;
             }
 
-            $srcX   = 0;
-            $srcY   = 0;
-            $ratio  = 1;
-            if (!($requiredWidth <= $imageWidth && $requiredHeight <= $imageHeight)){
-                $widthRatio             = $requiredWidth / $imageWidth;
-                $heightRatio            = $requiredHeight / $imageHeight;
-                if ($isNewSizeFix ){
-                    $ratio              = $widthRatio >= $heightRatio ? $widthRatio : $heightRatio;
+            $srcX           = 0;
+            $srcY           = 0;
+            $ratio          = 1;
+            $zoomedWidth    = $imageWidth;
+            $zoomedHeight   = $imageHeight;
+
+            if ($requiredWidth <= $imageWidth && $requiredHeight <= $imageHeight) {
+                $widthRatio     = $imageWidth / $requiredWidth; // 19,2
+                $heightRatio    = $imageHeight / $requiredHeight; // 6,2
+
+                if ($isNewSizeFix){
+                    $ratio          = $widthRatio >= $heightRatio ? $heightRatio : $widthRatio; //6,2
+                    $zoomedWidth    = $requiredWidth * $ratio;//620
+                    $zoomedHeight   = $requiredHeight * $ratio;//200
+                    $srcX           = ($imageWidth - $zoomedWidth) / 2;
+                    $srcY           = ($imageHeight - $zoomedHeight) / 2;
                 } else{
-                    $ratio              = $widthRatio > $heightRatio ? $heightRatio : $widthRatio;
-                    $requiredWidth      = $imageWidth * $ratio;
-                    $requiredHeight     = $imageHeight * $ratio;
+                    $ratio          = $widthRatio > $heightRatio ? $widthRatio : $heightRatio; //19,2
+                    $requiredWidth  = $imageWidth / $ratio; //100
+                    $requiredHeight = $imageHeight / $ratio;//32,29
                 }
             }
-            $zoomedWidth    = $requiredWidth / $ratio;
-            $zoomedHeight   = $requiredHeight / $ratio;
-            $srcX           = ($imageWidth - $zoomedWidth) / 2;
-            $srcY           = ($imageHeight - $zoomedHeight) / 2;
+
             $newImage       = imagecreatetruecolor($requiredWidth, $requiredHeight);
             imagecopyresampled($newImage, $this->image, 0, 0, $srcX, $srcY, $requiredWidth, $requiredHeight, $zoomedWidth, $zoomedHeight);
             $this->image = $newImage;
