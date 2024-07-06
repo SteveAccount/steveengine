@@ -11,4 +11,5 @@ class FieldType{
     public const FLOAT      = "float";
     public const DATE       = "date";
     public const HTML       = "html";
+    public const ARRAY      = "array";
 }

@@ -35,7 +35,13 @@ class Email {
         return $this;
     }
 
-    public function send() {
+    public function send(array $header = []){
+        if ($header !== []) {
+            foreach ($header as $key => $value) {
+                $this->mail->addCustomHeader($key, $value);
+            }
+        }
+
         $result = false;
 
         if (count($this->address) > 0){
@@ -49,7 +55,7 @@ class Email {
             }
         }
 
-        return $result;
+        return $this->mail->Send();
     }
 
     private function emailConfig() {

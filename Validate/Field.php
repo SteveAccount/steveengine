@@ -19,6 +19,7 @@ class Field{
     public $pattern;
     public $message;
     public $checkFunction;
+    public $item;
 
     public static function new() : Field{
         return new self();
@@ -284,8 +285,38 @@ class Field{
         $newField
             ->type(FieldType::HTML)
             ->checkFunction = function($value) {
-            return preg_match("(script|onclick|onchange|onmouse|onkey|onload)", $value) === 1;
+
+            if (preg_match('/<iframe.*sandbox="allow-scripts allow-same-origin".*src="https:\/\/(www\.)?youtube\.com\/embed\/.*".*><\/iframe>/i', $value) === 1) {
+                //toLog("Iframe sandbox attributummal: " . $value);
+                return false;
+            }
+
+            if (preg_match('/<iframe.*src="https:\/\/(www\.)?youtube\.com\/embed\/.*".*><\/iframe>/i', $value) === 1) {
+                //toLog("Youtube video Iframe: " . $value);
+                return false;
+            }
+
+            if (preg_match('/<iframe/i', $value) === 1) {
+                // toLog("Nem engedélyezett Iframe: " . $value);
+                return true;
+            }
+
+            if (preg_match("/(script|onclick|onchange|onmouse|onkey|onload)/i", $value) === 1) {
+                // toLog("Veszélyes elemet tartalmaz: " . $value);
+                return true;
+            }
+
+            //toLog("Valid Tartalom: " . $value);
+            return false;
         };
+        return $newField;
+    }
+
+    public static function array() {
+        $newField = new self();
+        $newField
+            ->type(FieldType::ARRAY);
+
         return $newField;
     }
 }

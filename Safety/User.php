@@ -21,6 +21,7 @@ class User extends Model {
     public string   $passwordHash;
     public string   $permissions;
     public ?string  $startPage;
+    public int      $firstlogin;
 
     public static function new() : User {
         return new self();
@@ -35,6 +36,7 @@ class User extends Model {
 
     public static function getFieldsForChangePassword() : array {
         return [
+            "oldPassword"   => Field::password()->label("Régi Jelszó")->message("A Régi jelszónak az emailben kapott jelszót használd.")->required(),
             "password"      => Field::password()->label("Új jelszó")->message("A jelszó 5-20 karekter lehet és betűket, számokat tartalmazhat.")->required(),
             "passwordAgain" => Field::password()->label("Új jelszó megismétlése")->message("A jelszó 5-20 karekter lehet és betűket, számokat tartalmazhat.")->required(),
         ];
