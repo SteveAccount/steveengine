@@ -250,19 +250,22 @@ toLog($query);
         $this->tableName = null;
     }
 
-    protected function getConnection( bool $hasDatabase = true ) : \PDO{
-        try{
+    protected function getConnection(bool $hasDatabase = true) : \PDO {
+        try {
             $dsn = "mysql:host=".$this->connectionInfo["server"].";";
-            if ($this->connectionInfo["port"] != ""){
+            if ($this->connectionInfo["port"] != "") {
                 $dsn .= " port=".$this->connectionInfo["port"].";";
             }
-            if ( $this->connectionInfo["database"] != "" && $hasDatabase ){
+            if ($this->connectionInfo["database"] != "" && $hasDatabase) {
                 $dsn .= " dbname=".$this->connectionInfo["database"].";";
             }
             $dsn .= " charset=utf8";
-            $pdo = new \PDO( $dsn, $this->connectionInfo["username"], $this->connectionInfo["password"] );
+            $pdo = new \PDO($dsn, $this->connectionInfo["username"], $this->connectionInfo["password"]);
+
             return $pdo;
-        }catch(\PDOException $e){
+        } catch(\PDOException $e) {
+            toLog($this->connectionInfo);
+            toLog($e);
             die("Hiba történt az adatbázishoz való kapcsolódás során!");
         }
     }

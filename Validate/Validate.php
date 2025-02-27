@@ -99,7 +99,11 @@ class Validate extends Singleton {
                                         $value = (int)$value;
                                         break;
                                     case FieldType::BOOL:
-                                        $value = $value === "true";
+                                        if (in_array($value, [true, false, "0", "1", 0, 1, "true", "false"])) {
+                                            $value = $value === true || $value === 1 || $value === "1" || $value === "true";
+                                        } else {
+                                            throw new \Exception($field->label . " - Az érték nem megfelelő.");
+                                        }
                                 }
                             }
                         } else {

@@ -81,7 +81,7 @@ class Map {
 
         foreach ($map->routes as $method => $routes){
             foreach ($routes as &$route){
-                $route->permission = $route->permission === [] ? $permission : $route->permission;
+                $route->permission = array_merge($route->permission, $permission);
                 if ($route->path !== "" && $route->path !== "/"){
                     $route->path = $prefix . $route->path;
                 } else{

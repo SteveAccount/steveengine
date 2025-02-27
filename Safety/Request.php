@@ -13,7 +13,7 @@ class Request extends Singleton{
     private string  $ip;
     private array   $data;
     public ?User    $user;
-    private Session $session;
+    public Session $session;
     public string   $lang;
 
     public function prepare() : Request{
@@ -34,7 +34,7 @@ class Request extends Singleton{
         $this->ip( filter_var( $this->getIp() ));
         $this->sessionId    = $_SESSION["sessionId"] ?? "";
         $this->csrf         = $_POST["csrf"] ?? "";
-        $this->data         = $_POST + $_GET;
+        $this->data         = $_POST + $_GET + (json_decode(file_get_contents("php://input")) ?? []);
 
         if (!isset($_SESSION["lang"])) {
             $_SESSION["lang"] = config()->get("lang");

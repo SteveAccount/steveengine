@@ -7,6 +7,7 @@ use SteveEngine\Router\Router;
 use SteveEngine\Safety\Request;
 use SteveEngine\Translate;
 use SteveEngine\Validate\Validate;
+use SteveEngine\Redis;
 
 /**
  * Returns a singleton Config class.
@@ -207,4 +208,58 @@ function getPureFilename(string $filename) {
     $filename   = getUrl($basename) . "." . $extension;
 
     return $filename;
+}
+
+function findDir(string $path, string $filename = null) {
+    $results = [];
+
+    if (file_exists($path)) {
+        $files = scandir($path);
+        foreach ($files as $file) {
+            $filePath = implode(DIRECTORY_SEPARATOR, [$path, $file]);
+
+            if ($file !== '.' && $file !== '..') {
+                if (is_dir($filePath)) {
+                    if ($filename === null || $filename === $file) {
+                        $results[] = $filePath;
+                    } else {
+                        $results = array_merge($results, findDir($filePath, $filename));
+                    }
+                }
+            }
+        }
+    }
+
+    return $results;
+}
+
+function findFile(string $path, string $filename, bool $isFullName = true) {
+    $results = [];
+
+    $files = scandir($path);
+    foreach ($files as $file) {
+        if ($file !== '.' && $file !== '..') {
+            $filePath = implode(DIRECTORY_SEPARATOR, [$path, $file]);
+
+            if (is_dir($filePath)) {
+                $results = array_merge($results, findFile($filePath, $filename, $isFullName));
+            } else {
+                if ($isFullName) {
+                    if ($filename === $file) {
+                        $results[] = $filePath;
+                    }
+                } else {
+                    if (strpos($file, $filename) !== false) {
+                        $results[] = $filePath;
+                    }
+                }
+            }
+        }
+    }
+
+    return $results;
+}
+
+function redis() : Redis{
+    return Redis::new();
 }

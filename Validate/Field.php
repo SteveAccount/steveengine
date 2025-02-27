@@ -90,6 +90,22 @@ class Field{
         return $this;
     }
 
+    public static function enums(string $class, bool $allowAll = false) : Field {
+        $reflection = new \ReflectionClass($class);
+        $constants  = $reflection->getConstants();
+
+        if ($allowAll) {
+            $constants["all"] = "all";
+        }
+
+        $newField = new self();
+        $newField
+            ->type(FieldType::TEXT)
+            ->list(array_values($constants));
+
+        return $newField;
+    }
+
     public static function taxNumber() : Field{
         $newField = new self();
         $newField
@@ -316,6 +332,22 @@ class Field{
         $newField = new self();
         $newField
             ->type(FieldType::ARRAY);
+
+        return $newField;
+    }
+
+    public static function dbField() : Field {
+        $newField = new self();
+        $newField
+            ->type(FieldType::TEXT)
+            ->pattern("/^[a-z0-9_]{0,50}$/i");
+        return $newField;
+    }
+
+    public static function bool() : Field {
+        $newField = new self();
+        $newField
+            ->type(FieldType::BOOL);
 
         return $newField;
     }

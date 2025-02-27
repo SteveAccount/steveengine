@@ -75,14 +75,16 @@ class Router extends Singleton {
         redirect("error404");
     }
 
-    public function getPathByRouteName( string $name ) : ?string{
-        foreach ($this->map->routes as $method => $routes){
-            foreach ($routes as $route){
-                if ($route->name === $name){
+    public function getPathByRouteName(string $name) : ?string {
+        foreach ($this->map->routes as $method => $routes) {
+            foreach ($routes as $route) {
+                if ($route->name === $name) {
+
                     return $route->path;
                 }
             }
         }
+
         return null;
     }
 

@@ -68,7 +68,7 @@ class User extends Model {
         }
     }
 
-    public function generatePassword(array $passwordRules) {
+    public function generatePassword(array $passwordRules = null) {
         $countOfLower   = 0;
         $countOfUpper   = 0;
         $countOfNumber  = 0;
