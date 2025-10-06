@@ -13,6 +13,7 @@ class Session extends Model {
     public string   $sessionId;
     public string   $ip;
     public int      $userId;
+    public ?int     $pseudoUserId;
     public string   $expirationDate;
     public ?string  $token;
     public ?string  $checkCode1;

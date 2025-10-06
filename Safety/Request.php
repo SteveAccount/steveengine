@@ -48,7 +48,7 @@ class Request extends Singleton{
     public function check() : bool {
         //Ha nincs sessionId, akkor csinájunk, egyébként a session és a user betöltése.
         $this->session  = Session::getBySessionId($this->sessionId) ?? Session::new();
-        $this->user     = User::selectById($this->session->userId);
+        $this->user     = User::selectById($this->session->pseudoUserId ?? $this->session->userId);
 
         // Várt útvonal és id, valamint az ellenőrzőkódok vizsgálata
         if ($this->method === "post" && isset($this->session->checkRoute)) {

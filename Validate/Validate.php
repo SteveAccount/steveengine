@@ -43,6 +43,12 @@ class Validate extends Singleton {
             if (!isset($inputData[$key]) && $field->isRequired){
                 $this->errors[$key] = $field->label . " - Kötelező mező";
             }
+
+            if ($field->requiredByCondition && call_user_func($field->requiredByCondition, $inputData)) {
+                if (!isset($inputData[$key]) || $inputData[$key] === ""){
+                    $this->errors[$key] = $field->label . " - Kötelező mező";
+                }
+            }
         }
 
         //Ellenőrzés
@@ -87,7 +93,7 @@ class Validate extends Singleton {
                             } else{
                                 switch ($field->type) {
                                     case "html":
-                                        if ($field->checkFunction && call_user_func($field->checkFunction, $value)) {
+                                        if (!$field->checkFunction && call_user_func($field->checkFunction, $value)) {
                                             throw new \Exception($field->label . " - A html-ben tiltott tartalom van.");
                                         }
                                         break;
@@ -111,6 +117,15 @@ class Validate extends Singleton {
                                 $value = null;
                             }
                         }
+                        if (!$field->requiredByCondition || $field->requiredByCondition && call_user_func($field->requiredByCondition, $inputData)) {
+                            if ($field->checkFunction) {
+                                $answer = call_user_func($field->checkFunction, $value);
+
+                                if (!$answer["isOK"]) {
+                                    throw new \Exception($field->label . " - " . $answer["message"]);
+                                }
+                            }
+                        }
                     }
                 }
                 $inputData[$key] = is_array($fieldValue) ? $values : $values[0];
@@ -118,7 +133,7 @@ class Validate extends Singleton {
                 $this->errors[$key] = $e->getMessage();
             }
         }
-        return !( count( $this->errors ) > 0);
+        return !(count($this->errors) > 0);
     }
 
     /**

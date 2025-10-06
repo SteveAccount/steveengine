@@ -121,4 +121,54 @@ class User extends Model {
 
         return in_array($permission, $permissions);
     }
+
+    public function checkPassword(string $password, array $passwordRules = null) : bool {
+        $result = true;
+        $countOfLower   = 0;
+        $countOfUpper   = 0;
+        $countOfNumber  = 0;
+        $countOfSpecial = 0;
+        $types          = ["lower", "upper", "number", "special"];
+        $chars          = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "x", "y", "w", "z"];
+        $numbers        = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+        $specials       = ["-", "_", "!", "+", "/", "=", "(", ")"];
+
+        if (!$passwordRules) {
+            $passwordRules  = config()->get("passwordRules");
+        }
+
+        if (strlen($password) >= $passwordRules["minLength"]) {
+            for ($i = 0; $i < strlen($password); $i++) {
+                $char = $password[$i];
+
+                if (in_array($char, $chars)) {
+                    $countOfLower++;
+                }
+                if (in_array($char, $numbers)) {
+                    $countOfNumber++;
+                }
+                if (in_array($char, $specials)) {
+                    $countOfSpecial++;
+                }
+                if ($char !== strtolower($char)) {
+                    $char = strtolower($char);
+                    if (in_array($char, $chars)) {
+                        $countOfUpper++;
+                    }
+                }
+            }
+
+            toLog([$countOfUpper, $countOfSpecial, $countOfLower, $countOfNumber]);
+            if ($countOfLower < $passwordRules["lowers"]
+            || $countOfNumber < $passwordRules["numbers"]
+            || $countOfSpecial < $passwordRules["specials"]
+            || $countOfUpper < $passwordRules["uppers"]) {
+                $result = false;
+            }
+        } else {
+            $result = false;
+        }
+
+        return $result;
+    }
 }

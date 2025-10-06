@@ -5,8 +5,8 @@ namespace SteveEngine\Menu;
 use SteveEngine\TreeNode;
 
 class Menu {
-    public function getMenuFromModuls() : string {
-        $menuItems  = $this->getMenuItemsFromModuls();
+    public function getMenuFromModuls($menuItems = null) : string {
+        $menuItems  = $menuItems ?? $this->getMenuItemsFromModuls();
         $menuTree   = new TreeNode();
         $menuTree->fillTree($menuItems, "name", "parentName");
         $menu = $this->renderMenu($menuTree);

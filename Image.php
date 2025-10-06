@@ -16,11 +16,11 @@ class Image{
     /**
      * @var array
      */
-    private $imageInfo;
+    public $imageInfo;
     /**
      * @var array
      */
-    private $imageType;
+    public $imageType;
 
     /**
      * Make a new Image class.

@@ -12,6 +12,7 @@ class Field{
     public $outputType  = "string";
     public $isRequired  = false;
     public $isUnique    = false;
+    public $requiredByCondition;
     public $tableName   = "";
     public $min;
     public $max;
@@ -47,6 +48,11 @@ class Field{
 
     public function required(bool $isRequired = true) : Field{
         $this->isRequired = $isRequired;
+        return $this;
+    }
+
+    public function requiredByCondition($requiredCondition = null) : Field {
+        $this->requiredByCondition = $requiredCondition;
         return $this;
     }
 
@@ -174,7 +180,7 @@ class Field{
             ->label("Jelszó")
             ->type(FieldType::PASSWORD)
             ->maxLength(20)
-            ->pattern("/^[a-z0-9]{5,20}$/i");
+            ->pattern("/^[a-z0-9_!=\/\+\-\(\)]*$/ui");
         return $newField;
     }
 
@@ -191,7 +197,7 @@ class Field{
 
     public static function repeatPassword() : Field{
         $newField = new self();
-        $newField->name("repeatPassword")->label("Jelszó megismétlése")->type(FieldType::PASSWORD)->maxLength(20)->pattern("/^[a-z0-9]{5,20}$/");
+        $newField->name("repeatPassword")->label("Jelszó megismétlése")->type(FieldType::PASSWORD)->maxLength(20)->pattern("/^[a-z0-9_!=\+\-\(\)]*$/ui");
         return $newField;
     }
 
@@ -201,12 +207,23 @@ class Field{
         return $newField;
     }
 
-    public static function number(int $min = 0, int $max = 100) : Field{
+    public static function number(int $min = null, int $max = null) : Field{
         $newField = new self();
         $newField
-            ->min($min)
-            ->max($max)
-            ->type(FieldType::INTEGER);
+            ->type(FieldType::INTEGER)
+            ->checkFunction = function ($value) use ($newField, $min, $max) {
+                $status = ($min === null || $value >= $min) && ($max === null || $value <= $max);
+
+                $min = $min ? $min-- : null;
+                $max = $max ? $max++ : null;
+                $message = ($min !== null && $max !== null) ? "Az értéknek $min és $max között kell lennie." :
+                    ($min !== null ? "Az értéknek nagyobbnak kell lennie, mint $min." : "Az értéknek kisebbnek kell lennie, mint $max.");
+                return [
+                    "isOK" => $status,
+                    "message" => $newField->message ?? $message,
+                ];
+        };
+
         return $newField;
     }
 
@@ -244,7 +261,7 @@ class Field{
         $newField = new self();
         $newField
             ->maxLength($maxLength)
-            ->pattern("/^[ a-zöüóúőűáéí0-9\-_\.'\/\?]*$/uim");
+            ->pattern("/^[ a-zöüóúőűáéí0-9_,;\+\-\.'\/\?~:\(\)]*$/uim");
         return $newField;
     }
 
@@ -301,30 +318,19 @@ class Field{
         $newField
             ->type(FieldType::HTML)
             ->checkFunction = function($value) {
-
-            if (preg_match('/<iframe.*sandbox="allow-scripts allow-same-origin".*src="https:\/\/(www\.)?youtube\.com\/embed\/.*".*><\/iframe>/i', $value) === 1) {
-                //toLog("Iframe sandbox attributummal: " . $value);
-                return false;
-            }
-
-            if (preg_match('/<iframe.*src="https:\/\/(www\.)?youtube\.com\/embed\/.*".*><\/iframe>/i', $value) === 1) {
-                //toLog("Youtube video Iframe: " . $value);
-                return false;
-            }
-
-            if (preg_match('/<iframe/i', $value) === 1) {
-                // toLog("Nem engedélyezett Iframe: " . $value);
-                return true;
-            }
+                $status = true;
 
             if (preg_match("/(script|onclick|onchange|onmouse|onkey|onload)/i", $value) === 1) {
                 // toLog("Veszélyes elemet tartalmaz: " . $value);
                 return true;
             }
 
-            //toLog("Valid Tartalom: " . $value);
-            return false;
+                return [
+                    "status" => $status,
+                    "message"   => "Nem megengedett formátum",
+                ];
         };
+
         return $newField;
     }
 

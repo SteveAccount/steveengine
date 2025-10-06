@@ -14,13 +14,15 @@ abstract class ControllerForModulSystem{
 
     public function __construct(string $folderInModul = "Templates"){
         $parts      = explode("\\", get_class($this));
-        $path       = implode(DIRECTORY_SEPARATOR, [config()->get("appPath"), "Moduls", $parts[0], $folderInModul]);
-        $loader     = new FilesystemLoader($path);
-        $this->twig = new Environment($loader);
-        $this->twig->addFunction(new \Twig_SimpleFunction("trans", function($huString) {
-            $translate = Translate::new();
-            return $translate->trans($huString);
-        }));
+        $path       = implode(DIRECTORY_SEPARATOR, [$folderInModul, "Templates"]);
+        if (file_exists($path)) {
+            $loader     = new FilesystemLoader($path);
+            $this->twig = new Environment($loader);
+            $this->twig->addFunction(new \Twig_SimpleFunction("trans", function($huString) {
+                $translate = Translate::new();
+                return $translate->trans($huString);
+            }));
+        }
     }
 
     public function getData(string $functionName, string $where = ""){
@@ -83,7 +85,7 @@ abstract class ControllerForModulSystem{
         $limit = "limit $limitStart, " . $tableInfo["limit"];
 
         $query = "$query $where $orderBy $limit";
-toLog($query);
+
         return db()->query($query)->answer("StdClass")->select();;
     }
 }
