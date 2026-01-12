@@ -193,10 +193,10 @@ function getSettings(?string $key = null) {
 
 function getUrl(string $name) {
     if ($name) {
-        $name = strtolower($name);
+        $name = mb_strtolower($name, 'UTF-8');
         $name = str_replace(["ö", "ü", "ó", "ő", "ú", "é", "á", "ű", "í", " "], ["o", "u", "o", "o", "u", "e", "a", "u", "i", "-"], $name);
         $name = str_replace(["/", ","], "", $name);
-        $name = preg_replace("/[^a-zA-Z0-9-]/", "", $name);
+//        $name = preg_replace("/[^a-zA-Z0-9-]/", "", $name);
     }
 
     return $name;

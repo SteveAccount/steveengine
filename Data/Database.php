@@ -68,6 +68,10 @@ class Database extends Singleton{
         return $this;
     }
 
+    public function database() : string {
+        return $this->connectionInfo["database"];
+    }
+
     public function switchDb(string $databaseName){
         try{
            $this->pdo->exec("use " . $databaseName);

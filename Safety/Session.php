@@ -14,12 +14,14 @@ class Session extends Model {
     public string   $ip;
     public int      $userId;
     public ?int     $pseudoUserId;
+    public ?string  $permission;
     public string   $expirationDate;
     public ?string  $token;
     public ?string  $checkCode1;
     public ?string  $checkCode2;
     public ?int     $checkId;
     public ?string  $checkRoute;
+    public ?string  $params;
 
     public static function new(int $userId = 0) : Session {
         if ($userId !== 0) {

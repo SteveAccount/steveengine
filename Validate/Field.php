@@ -326,7 +326,7 @@ class Field{
             }
 
                 return [
-                    "status" => $status,
+                    "isOK" => $status,
                     "message"   => "Nem megengedett formátum",
                 ];
         };
@@ -355,6 +355,14 @@ class Field{
         $newField
             ->type(FieldType::BOOL);
 
+        return $newField;
+    }
+
+    public static function relativeUrl(int $maxLength = 200) : Field{
+        $newField = new self();
+        $newField
+            ->maxLength($maxLength)
+            ->pattern("/^(?![a-zA-Z][a-zA-Z\d+\-.]*:).+$/");
         return $newField;
     }
 }

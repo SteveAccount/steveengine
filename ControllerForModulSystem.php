@@ -14,7 +14,7 @@ abstract class ControllerForModulSystem{
 
     public function __construct(string $folderInModul = "Templates"){
         $parts      = explode("\\", get_class($this));
-        $path       = implode(DIRECTORY_SEPARATOR, [$folderInModul, "Templates"]);
+        $path       = implode(DIRECTORY_SEPARATOR, [$folderInModul]);
         if (file_exists($path)) {
             $loader     = new FilesystemLoader($path);
             $this->twig = new Environment($loader);
