@@ -253,7 +253,7 @@ class Field{
         $newField = new self();
         $newField
             ->maxLength($maxLength)
-            ->pattern("/^[ a-zöüóúőűáéí0-9_,;\+\-\.'\/\?~:\(\)]*$/ui");
+            ->pattern("/^[ a-zöüóúőűáéí0-9_,;\@\\\+\-\.'\/\?~\(\):]*$/ui");
         return $newField;
     }
 
@@ -262,6 +262,28 @@ class Field{
         $newField
             ->maxLength($maxLength)
             ->pattern("/^[ a-zöüóúőűáéí0-9_,;\+\-\.'\/\?~:\(\)]*$/uim");
+        return $newField;
+    }
+
+    public static function multiRowText2(int $maxLength = 100) : Field{
+        $newField = new self();
+        $newField
+            ->maxLength($maxLength)
+            ->checkFunction = function($value) {
+            $status = true;
+
+            if ($value) {
+                if (preg_match("/[<>=;\'\"]/", $value)) {
+                    $status = false;
+                }
+            }
+
+            return [
+                "isOK" => $status,
+                "message"   => "A szöveg nem megengedett karaktereket tartalmaz (<>=;\"').",
+            ];
+        };
+
         return $newField;
     }
 

@@ -36,8 +36,16 @@ class Router extends Singleton {
                 if (class_exists($class)) {
                     if (method_exists($class, $route->method)) {
                         $method = $route->method;
+                        $myClass = null;
+                        try {
+                            $myClass = new $class;
+                        } catch (\Exception $e) {
+                            http_response_code($e->getCode());
+                            echo $e->getMessage();
+                            exit;
+                        }
 
-                        if ($myClass = new $class) {
+                        if ($myClass) {
                             if ($this->isPermissionOK($route, request()->user)) {
                                 try{
                                     if ($param) {
@@ -51,6 +59,7 @@ class Router extends Singleton {
                                     toLog($e);
                                     http_response_code($e->getCode());
                                     echo $e->getMessage();
+                                    exit;
                                 }
                                 return;
                             } else {
@@ -72,6 +81,7 @@ class Router extends Singleton {
                 break;
             }
         }
+
         redirect("error404");
     }
 
