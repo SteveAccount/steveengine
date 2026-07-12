@@ -4,7 +4,7 @@
   "type": "library",
   "autoload": {
     "psr-4": {
-      "SteveEngine\\": "/"
+      "SteveEngine\\": ""
     }
   },
   "require": {
@@ -14,10 +14,10 @@
   },
   "scripts": {
     "post-install-cmd": [
-      "vendor\\SteveAccount\\steveengine\\ComposerInstall::postInstall"
+      "SteveEngine\\ComposerInstall::postInstall"
     ],
     "post-update-cmd": [
-      "vendor\\SteveAccount\\steveengine\\ComposerInstall::postUpdate"
+      "SteveEngine\\ComposerInstall::postUpdate"
     ]
   }
 }
