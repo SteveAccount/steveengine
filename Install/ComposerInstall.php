@@ -1,22 +1,24 @@
 <?php
-namespace SteveEngine;
+namespace SteveEngine\Install;
 
 class ComposerInstall {
     public array $folders = [
         "Modules", "Main", "System"
     ];
 
-    public static function postInstall(\Composer\Script\Event $event) {
+    public static function postInstall(): void {
         $composerInstall = new self;
         $composerInstall->setFolders();
+        $composerInstall->setTables();
     }
 
-    public static function postUpdate(\Composer\Script\Event $event) {
+    public static function postUpdate(): void {
         $composerInstall = new self;
         $composerInstall->setFolders();
+        $composerInstall->setTables();
     }
 
-    private function setFolders() {
+    private function setFolders(): void {
         $rootFolder =  realpath($_SERVER['DOCUMENT_ROOT']);
         $appPath = dirname($rootFolder);
 

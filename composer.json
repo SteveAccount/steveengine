@@ -1,23 +1,16 @@
 {
   "name": "steveaccount/steveengine",
   "description": "My PHP engine",
-  "type": "library",
+  "type": "composer-plugin",
   "autoload": {
     "psr-4": {
       "SteveEngine\\": ""
     }
   },
   "require": {
+    "composer-plugin-api": "^2.0",
     "php": "^8.2.0",
-    "twig/twig": "^1.6.5",
+    "twig/twig": "3.19.0.0",
     "ext-json": "*"
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "SteveEngine\\ComposerInstall::postInstall"
-    ],
-    "post-update-cmd": [
-      "SteveEngine\\ComposerInstall::postUpdate"
-    ]
   }
 }
