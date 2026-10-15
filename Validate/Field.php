@@ -96,6 +96,19 @@ class Field{
         return $this;
     }
 
+    public function listFromData(string $tablename, string $field = "name", array $conditions = null) : Field{
+        $query = "
+            select $field
+            from $tablename
+        ";
+        $items = db()->query( $query )->select() ?? [];
+        foreach ($items as $item) {
+            $this->list[] = $item->$field;
+        }
+
+        return $this;
+    }
+
     public static function enums(string $class, bool $allowAll = false) : Field {
         $reflection = new \ReflectionClass($class);
         $constants  = $reflection->getConstants();
@@ -139,6 +152,16 @@ class Field{
             ->label("Adóazonosító")
             ->type(FieldType::TEXT)
             ->pattern("/^[0-9]{10}$/");
+        return $newField;
+    }
+
+    public static function idCardNUmber() : Field{
+        $newField = new self();
+        $newField
+            ->name("idCardNumber")
+            ->label("SZIG-szám")
+            ->type(FieldType::TEXT)
+            ->pattern("/^([A-Z]{2}[-\s]?(?:[I|V|X]+[-\s]?)?\d{6}|\d{6}[A-Z]{2})$/");
         return $newField;
     }
 

@@ -15,6 +15,8 @@ class Request extends Singleton{
     public ?User    $user;
     public Session $session;
     public string   $lang;
+    public array    $userPermissions;
+    public string   $nonce;
 
     public function prepare() : Request{
         session_start();
@@ -33,7 +35,6 @@ class Request extends Singleton{
         }
         $this->ip( filter_var( $this->getIp() ));
         $this->sessionId    = $_SESSION["sessionId"] ?? "";
-        $this->csrf         = $_POST["csrf"] ?? "";
         $this->data         = $_POST + $_GET + (json_decode(file_get_contents("php://input")) ?? []);
 
         if (!isset($_SESSION["lang"])) {
@@ -49,6 +50,9 @@ class Request extends Singleton{
         //Ha nincs sessionId, akkor csinájunk, egyébként a session és a user betöltése.
         $this->session  = Session::getBySessionId($this->sessionId) ?? Session::new();
         $this->user     = User::selectById($this->session->pseudoUserId ?? $this->session->userId);
+        if ($this->user) {
+            $this->userPermissions = $this->user->getPermissions();
+        }
 
         // Várt útvonal és id, valamint az ellenőrzőkódok vizsgálata
         if ($this->method === "post" && isset($this->session->checkRoute)) {
@@ -84,12 +88,12 @@ class Request extends Singleton{
         }
 
         //Ha a method GET, az útvonal loginPage vagy regPage, akkor mehet tovább.
-        if ($this->method === "get" && ($this->path === route(config()->get("loginPage")) || $this->path === route("regPage"))){
+        if ($this->method === "get" && ($this->path === route("loginPage"))) {
             return true;
         }
 
         //Ha a method POST, az útvonal login vagy reg, akkor mehet tovább.
-        if ($this->method === "post" && ($this->path === route(config()->get("loginPage")) || $this->path === route("reg"))){
+        if ($this->method === "post" && ($this->path === route("login"))) {
             return true;
         }
 

@@ -13,12 +13,14 @@ class Session extends Model {
     public string   $sessionId;
     public string   $ip;
     public int      $userId;
+    public int      $myCompanyId;
     public ?int     $pseudoUserId;
     public ?string  $permission;
     public string   $expirationDate;
+    public string   $nonce;
     public ?string  $token;
-    public ?string  $checkCode1;
-    public ?string  $checkCode2;
+    public ?string  $formCheckCode1;
+    public ?string  $formCheckCode2;
     public ?int     $checkId;
     public ?string  $checkRoute;
     public ?string  $params;
@@ -33,7 +35,7 @@ class Session extends Model {
         $newSession->sessionId      = $newSession->getSessionId();
         $newSession->ip             = Request::new()->ip();
         $newSession->userId         = $userId;
-        $newSession->expirationDate = (new \DateTime())->add(new \DateInterval("PT" . config()->get("sessionExpirationInterval") . "H"))->format("Y-m-d H:i:s");
+        $newSession->expirationDate = (new \DateTime())->add(new \DateInterval("PT" . config()->get("sessionExpirationHours") . "H"))->format("Y-m-d H:i:s");
         $newSession->id             = $newSession->insert();
         $_SESSION["sessionId"]      = $newSession->sessionId;
 
@@ -56,6 +58,13 @@ class Session extends Model {
             ->run();
 
         return $hash;
+    }
+
+    public function newNonce() {
+        $this->nonce = base64_encode(random_bytes(16));
+        $this->update();
+
+        return $this->nonce;
     }
 
     private function getSessionId() : string {

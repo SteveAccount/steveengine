@@ -16,12 +16,12 @@ class User extends Model {
     public int      $id;
     public string   $name;
     public string   $email;
-    public string   $monogram;
-    public ?string  $image;
     public string   $passwordHash;
-    public string   $permissions;
-    public ?string  $startPage;
-    public int      $firstlogin;
+    public int      $isActive;
+    public int      $createdBy;
+    public string   $createdAt;
+    public ?int     $modifiedBy;
+    public ?string  $modifiedAt;
 
     public static function new() : User {
         return new self();
@@ -43,7 +43,20 @@ class User extends Model {
     }
 
     public function getPermissions() : array{
-        return json_decode($this->permissions, 1);
+        $userId = request()->user->id;
+        $query = "
+            select *
+            from permissions as p 
+            left join users_permissions_rel as upr on p.id = upr.permissionId
+            where upr.userId = $userId 
+        ";
+        $permissions = db()->query($query)->select() ?? [];
+        $permissionArray = [];
+        foreach($permissions as $permission) {
+            $permissionArray[] = $permission->permission;
+        }
+
+        return $permissionArray;
     }
 
     public static function changePassword() {
@@ -79,47 +92,56 @@ class User extends Model {
         $specials       = ["-", "_", "!", "+", "/", "=", "(", ")"];
 
         if (!$passwordRules) {
-            $passwordRules  = config()->get("passwordRules");
+            $passwordRules  = config()->getPasswordRules();
         }
 
         $password       = "";
         do {
+            $freeChars = $passwordRules["minLength"] - strlen($password);
             $type = $types[rand(0, 3)];
+            toLog([$password, $freeChars, $passwordRules]);
             switch($type) {
                 case "lower":
-                    if ($countOfLower < $passwordRules["lowers"]) {
+                    if ($passwordRules["lowers"] || $freeChars > ($passwordRules["uppers"] + $passwordRules["numbers"] + $passwordRules["specials"])) {
                         $password .= $chars[rand(0, 25)];
-                        $countOfLower++;
+                        $passwordRules["lowers"]--;
                     }
                     break;
                 case "upper":
-                    if ($countOfUpper < $passwordRules["uppers"]) {
+                    if ($passwordRules["uppers"] || $freeChars > ($passwordRules["lowers"] + $passwordRules["numbers"] + $passwordRules["specials"])) {
                         $password .= strtoupper($chars[rand(0, 25)]);
-                        $countOfUpper++;
+                        $passwordRules["uppers"]--;
                     }
                     break;
                 case "number":
-                    if ($countOfNumber < $passwordRules["numbers"]) {
+                    if ($passwordRules["numbers"] || $freeChars > ($passwordRules["uppers"] + $passwordRules["lowers"] + $passwordRules["specials"])) {
                         $password .= $numbers[rand(0, 9)];
-                        $countOfNumber++;
+                        $passwordRules["numbers"]--;
                     }
                     break;
                 case "special":
-                    if ($countOfSpecial < $passwordRules["specials"]) {
+                    if ($passwordRules["specials"] || $freeChars > ($passwordRules["uppers"] + $passwordRules["numbers"] + $passwordRules["lowers"])) {
                         $password .= $specials[rand(0, 7)];
-                        $countOfSpecial++;
+                        $passwordRules["specials"]--;
                     }
             }
 
-        } while (!($countOfLower === $passwordRules["lowers"] && $countOfNumber === $passwordRules["numbers"] && $countOfSpecial === $passwordRules["specials"] && $countOfUpper === $passwordRules["uppers"]));
+        } while (strlen($password) < $passwordRules["minLength"]);
 
         return $password;
     }
 
     public function hasPermission(string $permission) : bool {
-        $permissions = json_decode($this->permissions, 1);
+        $query = "
+            select *
+            from permissions as p
+            left join users_permissions_rel as upr on upr.permissionId = p.id
+            where p.permission = '$permission'
+        ";
 
-        return in_array($permission, $permissions);
+        $permissions = Permission::selectByQuery($query) ?? [];
+
+        return count($permissions) === 1;
     }
 
     public function checkPassword(string $password, array $passwordRules = null) : bool {
@@ -134,7 +156,7 @@ class User extends Model {
         $specials       = ["-", "_", "!", "+", "/", "=", "(", ")"];
 
         if (!$passwordRules) {
-            $passwordRules  = config()->get("passwordRules");
+            $passwordRules  = config()->getPasswordRules();
         }
 
         if (strlen($password) >= $passwordRules["minLength"]) {
@@ -158,7 +180,6 @@ class User extends Model {
                 }
             }
 
-            toLog([$countOfUpper, $countOfSpecial, $countOfLower, $countOfNumber]);
             if ($countOfLower < $passwordRules["lowers"]
             || $countOfNumber < $passwordRules["numbers"]
             || $countOfSpecial < $passwordRules["specials"]

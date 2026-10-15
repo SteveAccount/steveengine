@@ -18,10 +18,11 @@ abstract class ControllerForModulSystem{
         if (file_exists($path)) {
             $loader     = new FilesystemLoader($path);
             $this->twig = new Environment($loader);
-            $this->twig->addFunction(new \Twig_SimpleFunction("trans", function($huString) {
-                $translate = Translate::new();
-                return $translate->trans($huString);
-            }));
+            $this->twig->addGlobal("nonce", \request()->session->nonce);
+//            $this->twig->addFunction(new \Twig_SimpleFunction("trans", function($huString) {
+//                $translate = Translate::new();
+//                return $translate->trans($huString);
+//            }));
         }
     }
 

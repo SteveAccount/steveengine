@@ -110,7 +110,11 @@ abstract class Model {
 
         $where = "";
         foreach ($conditions as $fieldName => $value){
-            $where .= $where === "" ? "$fieldName = $value" : " and $fieldName = $value";
+            if (is_numeric($value)) {
+                $where .= $where === "" ? "$fieldName = $value" : " and $fieldName = $value";
+            } else {
+                $where .= $where === "" ? "$fieldName = '$value'" : " and $fieldName = '$value'";
+            }
         }
         $where  = $where === "" ? "" : "where $where";
         $query  = "select max($field) as maximum from $table $where";
@@ -158,8 +162,10 @@ abstract class Model {
     }
 
     protected function setFields(array $data) {
-        foreach ($data as $key => $value){
-            $this->$key = $value;
+        foreach ($data as $key => $value) {
+            if ($key !== "id") {
+                $this->$key = $value;
+            }
         }
     }
 }

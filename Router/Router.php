@@ -2,7 +2,6 @@
 
 namespace SteveEngine\Router;
 
-use SteveEngine\Config;
 use SteveEngine\Safety\User;
 use SteveEngine\Singleton;
 

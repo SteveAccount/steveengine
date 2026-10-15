@@ -65,6 +65,7 @@ function validate() : Validate {
  */
 function redirect(string $routeName) {
     if ($route = route($routeName)) {
+
         header( "Location: " . $route );
         exit;
     }
@@ -76,9 +77,15 @@ function redirect(string $routeName) {
 
 function response($message, int $code = 200, bool $isJson = true) {
     http_response_code($code);
+    myHeader()->create();
     $message = $isJson ? json_encode($message) : $message;
 
     return $message;
+}
+
+function myHeader() {
+    return \SteveEngine\Safety\Header::new();
+
 }
 
 /**
